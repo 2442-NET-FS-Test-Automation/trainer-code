@@ -60,4 +60,96 @@ public class Program
 
     }
 
+    private static void ControlFlow()
+    {
+        Console.WriteLine("\n== Control Flow ==");
+
+
+        // If - else if - else
+        int copiesAvailable = 0; 
+        bool isMember = true;
+
+        if(copiesAvailable > 1 ) 
+            Console.WriteLine("Many available for checkout!");
+        else if (copiesAvailable == 1) {
+            Console.WriteLine("Last copy!");
+        }
+        else {
+            Console.WriteLine("Out of stock!");
+            Console.WriteLine("Check again later!");
+        }
+
+        // Switch
+        string genre = "Mystery";
+
+
+        // Classic switch - notice C# cares about intent alot! No fall through like in other langauges
+        switch (genre)
+        {
+            case "Mystery":
+                Console.WriteLine("Check section A!");
+                break;
+            case "Science-Fiction":
+                Console.WriteLine("Check Section F!");
+                break;
+            default:  // While optional, a default case to catch any edge cases is best practices
+                Console.WriteLine("Uh oh");
+                break;
+        }
+
+        // New in .NET 8, Switch Expressions! You don't have to use these - they prooobably wont come up in QC
+        // but they're used out in real world code, so here is an example. In a switch expression, we want 
+        // a return value from the switch - we can then use that value to print out a result
+        string section = genre switch
+        {
+          // This is my expression body
+          "Mystery" => "Section A",
+          "Science-Fiction" => "Section F",
+          _ => "Uh oh" //default  
+        };
+        Console.WriteLine(section);
+
+    }
+
+    private static void  Loops()
+    {
+        // C# provides for loops as well, same as Java and any other language
+        // For, while, do-while, etc
+        for (int day = 1, day <= 3; day++)
+        {
+            Console.WriteLine($"Reminder day {day}: fee so far {CalculateLateFee(day)}");
+        }
+        
+        int onShelf = 3;
+        while (onShelf > 0)
+            Console.WriteLine($"{onShelf} copies on the shelf!");
+            onShelf--; // quick decrement shorthand
+
+        Console.WriteLine("No copies on shelf!");
+
+        string myString = "dog";
+
+        myString = "cat";
+    }
+
+    // I can use this shorthand for one line methods
+    private static decimal CalculateLateFee(int daysLate) => daysLate * 2;
+
+
+    private static void ArraysWork()
+    {
+        // C# provides for Arrays as well as lists and other collections - we'll get to those later. 
+        string[] books = { "Dune", "Harry Potter", "Percy Jackson", "Lord of the Rings" };
+        
+        Console.WriteLine(books[2]); // I can access indiviudal elements - keeping in mind we index at 0
+        
+        // C# allows for for-each loops
+        foreach (string book in books)
+        {
+            Console.WriteLine(book);
+        }
+
+    }
+
+
 }
