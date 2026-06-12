@@ -20,6 +20,7 @@ public class Program
         // that code to run, I need to call it inside Main()
         Program.DataTypesAndOperators();
         ClassesExample();
+        OopDemo();
     }
 
     // private - accessible only within this class
@@ -173,5 +174,45 @@ public class Program
 
     }
 
+    public static void OopDemo()
+    {
+     
+        Console.WriteLine("\n\n == OOP Demo stuff == ");
+
+        // Leveraging polymorphism - Books, ReferenceBooks, Magazines - all are LibraryItems.
+        LibraryItem[] catalog =
+        {
+            new Book("Dune", "Frank Herbert", 2),
+            new ReferenceBook("C# Language Standards", "Microsoft", "Technology"),
+            new Magazine("Sports Illustrated", "Francisco", 5, "Conde Naste")    
+        };
+
+        foreach(LibraryItem item in catalog)
+        {
+            Console.WriteLine(item.Describe());
+        }
+
+        // We can even use interfaces as reference types
+        foreach(LibraryItem item in catalog)
+        {
+            if (item is ILendable lendable)
+            {
+                Console.WriteLine($"{item.Title}: checkout -> {lendable.Checkout()}");
+            }
+            else
+            {
+                Console.WriteLine($"{item.Title} is Reference only.");
+            }
+        }
+
+        // override vs new behavior
+        Magazine wired = new Magazine("Wired", "Luis", 3, "Conde Nast");
+        LibraryItem baseMag = wired;
+
+        Console.WriteLine("== Override vs new on the same object, different ref type");
+        Console.WriteLine($"Magazine reference -> {wired.Describe()}");
+        Console.WriteLine($"LibraryItem reference -> {baseMag.Describe}");
+
+    }
 
 }
