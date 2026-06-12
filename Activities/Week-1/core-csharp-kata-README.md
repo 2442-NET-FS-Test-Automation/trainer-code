@@ -23,7 +23,7 @@ The `switch` dispatches commands, the `while` keeps the app running, each comman
 
 ## The Demo This Mirrors
 
-The `core-csharp-kata` thread committed the syntax basics, class basics, and oop (inheritance, polymorphism, abstraction, encapsulation, interfaces & abstract classes, access modifiers, `static`, override vs new, overloading) in the **Library** domain. That demo prints fixed output to teach the features in isolation. You mirror it at the **concept level** — same classes and OOP pillars, your own domain — but wrapped in an interactive app instead of a print-only `Main`.
+The `LibraryKata` demo committed the syntax basics, class basics, and oop (inheritance, polymorphism, abstraction, encapsulation, interfaces & abstract classes, access modifiers, `static`, override vs new, overloading) in the **Library** domain. That demo prints fixed output to teach the features in isolation. You mirror it at the **concept level** — same classes and OOP pillars, your own domain — but wrapped in an interactive app instead of a print-only `Main`.
 
 ## Choose Your Domain
 
