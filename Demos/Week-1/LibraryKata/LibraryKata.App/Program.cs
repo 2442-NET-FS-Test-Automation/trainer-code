@@ -210,8 +210,8 @@ public class Program
         LibraryItem baseMag = wired;
 
         Console.WriteLine("== Override vs new on the same object, different ref type");
-        Console.WriteLine($"Magazine reference -> {wired.Describe()}");
-        Console.WriteLine($"LibraryItem reference -> {baseMag.Describe}");
+        Console.WriteLine($"Magazine reference -> {wired.ShelfLabel()}");
+        Console.WriteLine($"LibraryItem reference -> {baseMag.ShelfLabel()}");
 
     }
 
