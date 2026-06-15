@@ -19,6 +19,11 @@ public class Program
         // main method. I wrote my code, inside DataTypesAndOperators() - a separate method. So if I want 
         // that code to run, I need to call it inside Main()
         Program.DataTypesAndOperators();
+        // Wired in: these were defined but never called from Main, so the control-flow,
+        // loops, and arrays demos never actually ran. Call them in source order.
+        ControlFlow();
+        Loops();
+        ArraysWork();
         ClassesExample();
         OopDemo();
         CollectionsDemo();
@@ -126,10 +131,15 @@ public class Program
             Console.WriteLine($"Reminder day {day}: fee so far {CalculateLateFee(day)}");
         }
         
+        // FIX: this while loop had no braces, so ONLY the WriteLine was the loop body and the
+        // onShelf-- decrement sat OUTSIDE the loop - onShelf never changed, an infinite loop.
+        // Brace the body so the counter decrements each pass and the loop terminates.
         int onShelf = 3;
         while (onShelf > 0)
+        {
             Console.WriteLine($"{onShelf} copies on the shelf!");
             onShelf--; // quick decrement shorthand
+        }
 
         Console.WriteLine("No copies on shelf!");
 
