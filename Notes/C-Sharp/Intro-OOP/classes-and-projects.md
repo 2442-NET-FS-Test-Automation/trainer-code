@@ -5,7 +5,7 @@
 - Organize code with namespaces and `using` directives.
 - Declare a C# class and instantiate objects from it.
 - Identify the four kinds of class members: fields, properties, methods, and constructors.
-- Initialize objects with constructors, constructor chaining, and object initializers.
+- Initialize objects with constructors, constructor chaining, primary constructors, and object initializers.
 - Distinguish instance members from `static` members.
 
 ## Why This Matters
@@ -136,6 +136,21 @@ The `this` keyword refers to *the current object*. Use it to disambiguate a para
 public Book(string title) { this.Title = title; }
 ```
 
+### Primary constructors
+Modern C# can declare the constructor parameters right on the class header — a **primary constructor**. Those parameters are in scope throughout the class body, which cuts the boilerplate of a field-by-field assignment for simple types:
+
+```csharp
+public class Member(string name, int id)
+{
+    public string Name { get; } = name;   // members initialized straight from the parameters
+    public int Id { get; } = id;
+}
+
+var m = new Member("Ada", 1);
+```
+
+It is the same concept as a normal constructor with less ceremony — the header *is* the constructor. Reach for it on small, data-holding classes; keep a conventional constructor body when you need validation, multiple constructors, or extra setup logic.
+
 ### Object Initializers
 For properties without a matching constructor, **object initializer** syntax sets them right after `new`:
 
@@ -197,7 +212,7 @@ Console.WriteLine(book.Describe());
 - **Namespaces** group types and prevent collisions; `using` imports them.
 - A **class** is a blueprint; an **object** is an instance made with `new`.
 - The four member kinds: **fields** (state), **properties** (controlled access), **methods** (behavior), **constructors** (initialization).
-- Create objects with constructors (overload and **chain** via `: this(...)`) or **object initializers**; validate values in a property `set`; `this` is the current object.
+- Create objects with constructors (overload and **chain** via `: this(...)`, or use a **primary constructor** on the class header for simple types) or **object initializers**; validate values in a property `set`; `this` is the current object.
 - **Instance** members are per-object; **static** members belong to the class and are shared.
 
 > Tomorrow we apply these classes to the four pillars of object-oriented programming. Today, focus on getting the structure right.

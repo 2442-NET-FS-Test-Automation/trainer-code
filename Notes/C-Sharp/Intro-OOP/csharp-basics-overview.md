@@ -5,7 +5,7 @@
 - Use the arithmetic, comparison, equality, and logical operators correctly.
 - Direct program flow with `if`/`else`, `switch`, and the loop family.
 - Convert between types safely with casts, `Convert`, and `int.Parse` / `TryParse`.
-- Write and call methods, passing arguments and returning values.
+- Write and call methods, passing arguments and returning values, including a method that calls itself (recursion).
 - Explain how strings, the stack, the heap, and arrays store data in memory.
 
 ## Why This Matters
@@ -139,6 +139,20 @@ int sum = Add(3, 4); // 7
 
 Methods keep code DRY and testable — the seam your test-automation track later targets directly. Name them as verbs (`Calculate`, `Print`, `Validate`).
 
+A method may also call **itself** — **recursion**. Each call solves a smaller piece of the problem until it hits a **base case** that returns without recursing. Omit the base case and the calls never stop, overflowing the stack (`StackOverflowException`).
+
+```csharp
+int Factorial(int n)
+{
+    if (n <= 1) return 1;         // base case — stops the recursion
+    return n * Factorial(n - 1);  // recursive case — same method, smaller n
+}
+
+int result = Factorial(5); // 120
+```
+
+Recursion fits naturally nested problems (factorials, walking a folder tree); for plain counting a `for` loop is usually clearer and cheaper.
+
 ### Strings, Stack & Heap, Arrays
 
 **The stack and the heap** are two regions of memory.
@@ -227,7 +241,7 @@ Save this as `Program.cs` in a `dotnet new console` project and `dotnet run` to 
 - Convert types with casts (`(int)`), `Convert`, or `int.TryParse` (the safe choice for user input).
 - `&&` / `||` short-circuit; integer `/` truncates and `%` gives the remainder; `+=`/`++` and the ternary `?:` are everyday shortcuts.
 - Choose the loop that matches what you know: count (`for`), condition (`while`), collection (`foreach`).
-- Methods make logic reusable and testable; strings are immutable; arrays are fixed-size and zero-indexed; the stack holds locals, the heap holds objects.
+- Methods make logic reusable and testable (and may call themselves — recursion, which needs a base case); strings are immutable; arrays are fixed-size and zero-indexed; the stack holds locals, the heap holds objects.
 
 ## Additional Resources
 - [C# data types — Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types)

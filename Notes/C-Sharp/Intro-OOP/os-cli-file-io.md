@@ -27,7 +27,7 @@ Paths describe where you are in the tree. `/` separates folders; `.` is "here", 
 
 ```bash
 pwd                 # /c/Users/you/projects
-cd training-portfolio
+cd FirstName-Lastname
 ls -a               # see everything, including .gitignore
 ```
 

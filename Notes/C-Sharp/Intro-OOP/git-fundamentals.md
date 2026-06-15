@@ -8,7 +8,7 @@
 - Use a `.gitignore` to keep junk out of the repository.
 
 ## Why This Matters
-Every deliverable in this cohort is submitted as a Git commit or pull request, and every professional team builds on top of Git. It is the universal "save game with history" for code: it lets you undo mistakes, see who changed what and why, and combine work from many people without overwriting each other. Today you will create three repositories and push them. Get comfortable with the core loop — *change, stage, commit, push* — now, because you will run it hundreds of times before this cohort ends. (Branching, pull requests, and merge strategies come later in Week 3; today is the foundation.)
+Every deliverable in this cohort is submitted as a Git commit or pull request, and every professional team builds on top of Git. It is the universal "save game with history" for code: it lets you undo mistakes, see who changed what and why, and combine work from many people without overwriting each other. Today you will create your personal `FirstName-Lastname` repository and push to it — the single repo that holds all your work this cohort, one project folder per deliverable. Get comfortable with the core loop — *change, stage, commit, push* — now, because you will run it hundreds of times before this cohort ends. (Branching, pull requests, and merge strategies come later in Week 3; today is the foundation.)
 
 ## The Concept
 
@@ -87,13 +87,13 @@ Add `.gitignore` *before* your first commit so the junk is never tracked in the 
 A complete first-repo session, start to pushed:
 
 ```bash
-mkdir training-portfolio && cd training-portfolio
+mkdir FirstName-Lastname && cd FirstName-Lastname
 git init
 echo "bin/"  >  .gitignore
-echo "# My Training Portfolio"  >  README.md
+echo "# FirstName Lastname — Training"  >  README.md
 git add .
-git commit -m "Initialize portfolio with README and gitignore"
-git remote add origin https://github.com/you/training-portfolio.git
+git commit -m "Initialize repo with README and gitignore"
+git remote add origin https://github.com/you/FirstName-Lastname.git
 git branch -M main
 git push -u origin main
 ```
