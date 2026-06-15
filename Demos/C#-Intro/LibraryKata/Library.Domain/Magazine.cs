@@ -12,6 +12,17 @@ public class Magazine: LibraryItem, ILendable
         Publisher = publisher;
     }
 
+    // OVERLOADING: same constructor name, different parameter list - the compiler picks
+    // which one to run based on the arguments you pass.
+    // A LibraryItemFactory (Week 2) builds every item from the canonical
+    // (title, author, copies) shape. This overload lets a Magazine join that common path
+    // without forcing the caller to invent a publisher. It chains to the full constructor
+    // above with ': this(...)', supplying a default publisher.
+    public Magazine(string title, string author, int circulationCopies)
+        : this(title, author, circulationCopies, "Unknown")
+    {
+    }
+
     public override string Describe()
     {
         return $"{Title} magazine, published by {Publisher}";

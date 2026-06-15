@@ -19,6 +19,11 @@ public class Program
         // main method. I wrote my code, inside DataTypesAndOperators() - a separate method. So if I want 
         // that code to run, I need to call it inside Main()
         Program.DataTypesAndOperators();
+        // Wired in: these were defined but never called from Main, so the control-flow,
+        // loops, and arrays demos never actually ran. Call them in source order.
+        ControlFlow();
+        Loops();
+        ArraysWork();
         ClassesExample();
         OopDemo();
         CollectionsDemo();
@@ -126,10 +131,15 @@ public class Program
             Console.WriteLine($"Reminder day {day}: fee so far {CalculateLateFee(day)}");
         }
         
+        // FIX: this while loop had no braces, so ONLY the WriteLine was the loop body and the
+        // onShelf-- decrement sat OUTSIDE the loop - onShelf never changed, an infinite loop.
+        // Brace the body so the counter decrements each pass and the loop terminates.
         int onShelf = 3;
         while (onShelf > 0)
+        {
             Console.WriteLine($"{onShelf} copies on the shelf!");
             onShelf--; // quick decrement shorthand
+        }
 
         Console.WriteLine("No copies on shelf!");
 
@@ -228,16 +238,39 @@ public class Program
         // I could create my objects
         Book dune = new Book("Dune", "Frank Herbert", 3);
 
-        // Then add them
-        catalog._items.Add(dune);
+        // Then add them - we now go through Catalog.Add(), which wraps the private list.
+        // We never touch catalog._items directly anymore: the list is the Catalog's business.
+        catalog.Add(dune);
 
         // I can also just call a constructor inside the Add() method call
         // Methods having their arguments satisfied by the return of other methods is a common pattern
         // and sometimes you'll get like 4-5 callbacks deep in tools like ASP.NET
-        catalog._items.Add(new ReferenceBook("C# Language Specs", "Microsoft", "Technology"));
-        catalog._items.Add(new Magazine("Nat Geo", "Charlie", 4, "Conde Naste"));
+        catalog.Add(new ReferenceBook("C# Language Specs", "Microsoft", "Technology"));
+        catalog.Add(new Magazine("Nat Geo", "Charlie", 4, "Conde Naste"));
 
-        Console.WriteLine($"Catalog holds {catalog._items.Count}; first is {catalog._items[0].Title}");
+        // Count is a wrapper property; catalog[0] uses the indexer - reads like an array,
+        // but it's read-only, so no one can do catalog[0] = somethingElse.
+        Console.WriteLine($"Catalog holds {catalog.Count}; first is {catalog[0].Title}");
+
+        // The other containers, each reached through intent-named methods instead of raw fields:
+        // STACK (LIFO) - return cart: the last book dropped is the first re-shelved.
+        catalog.DropInReturnCart(catalog[0]);
+        catalog.DropInReturnCart(catalog[2]);
+        Console.WriteLine($"Return cart has {catalog.CartCount}; reshelving \"{catalog.Reshelve().Title}\" first");
+
+        // QUEUE (FIFO) - holds line: the first member to ask is the first served.
+        catalog.PlaceHold("Ada");
+        catalog.PlaceHold("Grace");
+        Console.WriteLine($"{catalog.HoldsWaiting} holds waiting; serving {catalog.ServeNextHold()} first");
+
+        // LINKEDLIST - a reading list we reorder; AddNextUp jumps to the front.
+        catalog.AddToReadingList(catalog[0]);
+        catalog.AddNextUp(catalog[1]);
+        Console.WriteLine("Reading list order:");
+        foreach (LibraryItem item in catalog.ReadingList)
+        {
+            Console.WriteLine($"  - {item.Title}");
+        }
 
         // Enum + Struct use
         ItemKind kind = ItemKind.Magazine; // example of selecting an enum value
@@ -258,10 +291,10 @@ public class Program
         Shelf<LibraryItem> shelf = new Shelf<LibraryItem>(2);
         Shelf<int> intShelf = new Shelf<int>(200);
         
-        shelf.TryAdd(catalog._items[0]);
-        shelf.TryAdd(catalog._items[1]);
+        shelf.TryAdd(catalog[0]);
+        shelf.TryAdd(catalog[1]);
 
-        Console.WriteLine($"Trying to add a third thing in our catalog: {shelf.TryAdd(catalog._items[2])}");
+        Console.WriteLine($"Trying to add a third thing in our catalog: {shelf.TryAdd(catalog[2])}");
 
         
     }
