@@ -154,7 +154,7 @@ public class InMemoryLibraryRepository : ILibraryRepository
 
 Running this prints `[INF] Added ...` and, on a bad lookup, `[WRN] Lookup miss for id 999` from the repo followed by `[ERR] Lookup failed ...` from the handler — the same failure logged with context at two layers.
 
-> Heads up: the linear `GetById` scan above is `O(n)` on purpose — Wednesday's `advanced-classes` swaps the list for a `Dictionary` to make it `O(1)`. A real DI container and a persistent repository come later (Week 4 and the SQL weeks); today we `new` these by hand.
+> Heads up: the linear `GetById` scan above is `O(n)` on purpose — Wednesday's `advanced-classes` swaps the list for a `Dictionary` to make it `O(1)`. A real DI container (Week 5) and a persistent repository (the SQL weeks) come later; today we `new` these by hand.
 
 ## Summary
 - **Return for routine outcomes, throw for broken assumptions** — fail loud and near the cause.

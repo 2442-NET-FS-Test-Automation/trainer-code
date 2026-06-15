@@ -2,12 +2,12 @@
 
 ## Learning Objectives
 - Call an HTTP API with a shared `HttpClient` and `async`/`await`, and explain why I/O work goes async.
-- Deserialize JSON into DTOs and map them into your domain through a factory.
+- Deserialize JSON into classes that match the response, and map them into your domain through a factory.
 - Run independent awaits concurrently with `Task.WhenAll`.
 - Validate input shape with `Regex`, and use `out` parameters, nullable value types with lifted operators, and recognize boxing.
 
 ## Why This Matters
-This is the T2 finale: today the `core-csharp-kata` console app becomes feature-complete. Everything so far ran on one thread, top to bottom — fine until you call the network, where a request takes hundreds of milliseconds and a blocked thread sits there doing nothing. Real applications pull data from somewhere, and doing that without freezing is the difference between a responsive program and a stalled one. Pulling real book data over HTTP, deserializing it, validating it, and overlapping the waits is exactly the shape every API client, integration test, and microservice you will write later takes. The repository, factory, and DTO seams you finish today are precisely where a real database plugs in next week — so this lesson is both an ending and a hinge into persistence.
+This is the T2 finale: today the `core-csharp-kata` console app becomes feature-complete. Everything so far ran on one thread, top to bottom — fine until you call the network, where a request takes hundreds of milliseconds and a blocked thread sits there doing nothing. Real applications pull data from somewhere, and doing that without freezing is the difference between a responsive program and a stalled one. Pulling real book data over HTTP, deserializing it, validating it, and overlapping the waits is exactly the shape every API client, integration test, and microservice you will write later takes. The repository, factory, and HTTP seams you finish today are precisely where a real database plugs in next week — so this lesson is both an ending and a hinge into persistence.
 
 ## The Concept
 
@@ -51,8 +51,8 @@ public class OpenLibraryClient
 
 Read `await` like blocking code; it simply does not block. An `async` method returns a `Task`, and `Task<T>` carries a result. The `Async` suffix is the naming convention for awaitable methods. A few hard rules: never call `.Result` or `.Wait()` (they deadlock and hide errors) — `await` all the way up to `Main`; and never use `async void` except for event handlers, because its exceptions vanish.
 
-### Deserialize JSON into DTOs
-A DTO mirrors the *wire shape*, not your domain. Match the JSON exactly, then map into your own type:
+### Deserialize JSON into matching classes
+Deserialize into a class that matches the JSON *shape*, not your domain. Match the JSON exactly, then map into your own type:
 
 ```csharp
 public class OpenLibraryBook
@@ -67,7 +67,7 @@ string author = book.Authors.Count > 0 ? book.Authors[0].Name : "Unknown";
 return LibraryItemFactory.Create(ItemKind.Book, book.Title, author);   // map through the factory
 ```
 
-`[JsonPropertyName("title")]` bridges JSON's `title` to C#'s `Title`; without it a casing mismatch silently leaves the property at its default with no error. Do not let a third party's JSON dictate your domain model — deserialize into the API's shape, then map to *your* `Book` through the one place that builds items (the factory from Tuesday).
+`[JsonPropertyName("title")]` bridges JSON's `title` to C#'s `Title`; without it a casing mismatch silently leaves the property at its default with no error. Deserialize into the API's shape, then map to *your* `Book` through the one place that builds items (the factory from Tuesday).
 
 ### Concurrency with `Task.WhenAll`
 Sequential awaits are still serial. To overlap independent waits, launch the tasks first, then await them together:
@@ -150,12 +150,12 @@ if (first is not null)
 
 With a live network it prints real, deserialized data built through the factory; with the network down it reads the canned `sample-book.json` and runs it through the *same* `Parse` — the only difference is where the bytes came from. That completes the kata: `core-csharp-kata` is feature-complete (T2 final).
 
-> Heads up: `IHttpClientFactory`, cancellation tokens, and retry policies are production HTTP concerns for Week 4; a real persistent data store is Friday's SQL kickoff and Week 3. Today's HTTP layer is the shape a database layer mirrors.
+> Heads up: `IHttpClientFactory`, cancellation tokens, and retry policies are production concerns for Week 5 (DI and the TPL); a real persistent data store is Friday's SQL kickoff and Week 3. Today's HTTP layer is the shape a database layer mirrors.
 
 ## Summary
 - **`async`/`await` frees the thread while waiting on I/O** — `HttpClient` is async-first, so `Main` becomes `async Task`; never `.Result`/`.Wait()` or `async void`.
 - **Share one `HttpClient`**; a new one per call exhausts sockets.
-- **DTOs mirror the wire; map them into your domain through the factory** — `[JsonPropertyName]` bridges names.
+- **Deserialize into classes that match the JSON; map them into your domain through the factory** — `[JsonPropertyName]` bridges names.
 - **`Task.WhenAll` overlaps independent awaits** — launch the tasks, then await once; awaiting in a loop is serial.
 - **Regex validates input shape** — verbatim `@"..."`, anchored with `^`/`$`; a type-`switch` branches on runtime type.
 - **`out` returns extra values, `int?` + lifted operators handle null, boxing is a hidden heap allocation** that generics avoid.
