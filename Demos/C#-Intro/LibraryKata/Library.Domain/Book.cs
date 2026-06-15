@@ -1,5 +1,10 @@
 namespace LibraryKata.Domain;
 
+/// <summary>
+/// 
+/// </summary> <summary>
+/// 
+/// </summary>
 public class Book : LibraryItem, ILendable
 {
     // What is unique to a book (for our demo?)

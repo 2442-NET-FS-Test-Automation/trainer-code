@@ -21,6 +21,7 @@ public class Program
         Program.DataTypesAndOperators();
         ClassesExample();
         OopDemo();
+        CollectionsDemo();
     }
 
     // private - accessible only within this class
@@ -213,6 +214,56 @@ public class Program
         Console.WriteLine($"Magazine reference -> {wired.ShelfLabel()}");
         Console.WriteLine($"LibraryItem reference -> {baseMag.ShelfLabel()}");
 
+    }
+
+    // Collections demo stuff
+    private static void CollectionsDemo()
+    {
+        Console.WriteLine("==== COLLECTIONS DEMO STUFF =====");
+
+        //Creating a catalog object
+        // Because this is backed by a list, it grows and shrinks for us
+        Catalog catalog = new();
+
+        // I could create my objects
+        Book dune = new Book("Dune", "Frank Herbert", 3);
+
+        // Then add them
+        catalog._items.Add(dune);
+
+        // I can also just call a constructor inside the Add() method call
+        // Methods having their arguments satisfied by the return of other methods is a common pattern
+        // and sometimes you'll get like 4-5 callbacks deep in tools like ASP.NET
+        catalog._items.Add(new ReferenceBook("C# Language Specs", "Microsoft", "Technology"));
+        catalog._items.Add(new Magazine("Nat Geo", "Charlie", 4, "Conde Naste"));
+
+        Console.WriteLine($"Catalog holds {catalog._items.Count}; first is {catalog._items[0].Title}");
+
+        // Enum + Struct use
+        ItemKind kind = ItemKind.Magazine; // example of selecting an enum value
+        
+        ShelfLocation location = new ShelfLocation(3,12); // struct - looks alot like a class, but it is a VALUE type
+
+        Console.WriteLine($"{kind} sits at {location}"); 
+
+        Book duneCopy = dune; // copies the reference
+        // lets say I modify duneCopy, what happens to the data in dune?
+        // all we copied was the pointer - these two things are not independent
+
+        ShelfLocation location2 = location; // copies the data/fields 
+        // these are not linked in the same way, I can edit the data in one without touching the other
+
+        // Generics: our own Shelf<T> that can hold anything - though technically all the collections
+        // we used thusfar have been generic classes themselves
+        Shelf<LibraryItem> shelf = new Shelf<LibraryItem>(2);
+        Shelf<int> intShelf = new Shelf<int>(200);
+        
+        shelf.TryAdd(catalog._items[0]);
+        shelf.TryAdd(catalog._items[1]);
+
+        Console.WriteLine($"Trying to add a third thing in our catalog: {shelf.TryAdd(catalog._items[2])}");
+
+        
     }
 
 }
