@@ -2,7 +2,7 @@
 
 ## Learning Objectives
 - Call an HTTP API with a shared `HttpClient` and `async`/`await`, and explain why I/O work goes async.
-- Deserialize JSON into classes that match the response, and map them into your domain through a factory.
+- Deserialize a JSON response and build your domain object from the fields you read.
 - Run independent awaits concurrently with `Task.WhenAll`.
 - Validate input shape with `Regex`, and use `out` parameters, nullable value types with lifted operators, and recognize boxing.
 
@@ -51,23 +51,20 @@ public class OpenLibraryClient
 
 Read `await` like blocking code; it simply does not block. An `async` method returns a `Task`, and `Task<T>` carries a result. The `Async` suffix is the naming convention for awaitable methods. A few hard rules: never call `.Result` or `.Wait()` (they deadlock and hide errors) — `await` all the way up to `Main`; and never use `async void` except for event handlers, because its exceptions vanish.
 
-### Deserialize JSON into matching classes
-Deserialize into a class that matches the JSON *shape*, not your domain. Match the JSON exactly, then map into your own type:
+### Deserialize JSON, then build your domain object
+Deserialize the response into a built-in shape, read the fields you need, and build your own type from them:
 
 ```csharp
-public class OpenLibraryBook
+var map = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json);  // keyed by "ISBN:xxxx"
+foreach (JsonElement book in map!.Values)
 {
-    [JsonPropertyName("title")]   public string Title { get; set; } = "";
-    [JsonPropertyName("authors")] public List<OpenLibraryAuthor> Authors { get; set; } = new();
+    string title  = book.GetProperty("title").GetString() ?? "Untitled";
+    string author = book.GetProperty("authors")[0].GetProperty("name").GetString() ?? "Unknown";
+    return LibraryItemFactory.Create(ItemKind.Book, title, author);           // build through the factory
 }
-
-// later:
-var map = JsonSerializer.Deserialize<Dictionary<string, OpenLibraryBook>>(json);
-string author = book.Authors.Count > 0 ? book.Authors[0].Name : "Unknown";
-return LibraryItemFactory.Create(ItemKind.Book, book.Title, author);   // map through the factory
 ```
 
-`[JsonPropertyName("title")]` bridges JSON's `title` to C#'s `Title`; without it a casing mismatch silently leaves the property at its default with no error. Deserialize into the API's shape, then map to *your* `Book` through the one place that builds items (the factory from Tuesday).
+You read each field straight off the JSON by name (`GetProperty("title")`), so the names must match the payload — verify against the real response. Build *your* `Book` through the one place that makes items (the factory from Tuesday).
 
 ### Concurrency with `Task.WhenAll`
 Sequential awaits are still serial. To overlap independent waits, launch the tasks first, then await them together:
@@ -155,7 +152,7 @@ With a live network it prints real, deserialized data built through the factory;
 ## Summary
 - **`async`/`await` frees the thread while waiting on I/O** — `HttpClient` is async-first, so `Main` becomes `async Task`; never `.Result`/`.Wait()` or `async void`.
 - **Share one `HttpClient`**; a new one per call exhausts sockets.
-- **Deserialize into classes that match the JSON; map them into your domain through the factory** — `[JsonPropertyName]` bridges names.
+- **Deserialize the JSON into a built-in shape, read the fields you need, and build your domain object through the factory.**
 - **`Task.WhenAll` overlaps independent awaits** — launch the tasks, then await once; awaiting in a loop is serial.
 - **Regex validates input shape** — verbatim `@"..."`, anchored with `^`/`$`; a type-`switch` branches on runtime type.
 - **`out` returns extra values, `int?` + lifted operators handle null, boxing is a hidden heap allocation** that generics avoid.
