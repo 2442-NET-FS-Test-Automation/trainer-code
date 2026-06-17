@@ -39,6 +39,7 @@ public class Program
         OopDemo();
         CollectionsDemo();
         ExceptionsDemo();
+        AdvancedClassesDemo();
 
         // In case there are any lingering logs by the time we hit line 41 above
         // Don't just stop execution, write the logs to their sink THEN close the program
@@ -392,6 +393,55 @@ public class Program
         {
             throw new ItemNotAvailableException(book.Title);
         }
+    }
+
+    public static void AdvancedClassesDemo()
+    {
+        Console.WriteLine("\n == Advanced classes ==");
+
+        // First, a quick detour, lets interact with the GC
+        Console.WriteLine(GC.GetTotalMemory(forceFullCollection: false) / 1024);
+
+
+        ILibraryRepository repo = new InMemoryLibraryRepository();
+
+        // Create a book, but using our factory method - notice 
+        LibraryItem dune = LibraryItemFactory.Create(ItemKind.Book, "Dune", "Frank Herbert", copies: 3);
+
+        repo.Add(dune);
+
+        // Magazines need a publisher, but we provided a default value for the publisher argument in Create()
+        // lets see if it works
+        repo.Add(LibraryItemFactory.Create(ItemKind.Magazine, "Wired", "Axel", copies: 2));
+        repo.Add(LibraryItemFactory.Create(ItemKind.Book, "Dune Messiah", "Frank Herbert", copies: 3));
+        repo.Add(LibraryItemFactory.Create(ItemKind.ReferenceBook, "C# Language Reference", "Microsoft", 1, section: "Technology"));
+
+        Catalog catalog = new();
+        
+        foreach (LibraryItem item in repo.GetAll())
+        {
+            catalog.Add(item);
+        }
+
+        Console.WriteLine($"We have {catalog.Authors.Count} unique authors in our catalog");
+
+        foreach (string author in catalog.Authors)
+            Console.WriteLine(author); 
+
+        // Lets search our catalog now that it's backed by a dictionary
+        // lets use our Find() method
+        List<LibraryItem> byFrankHerbert = catalog.Find(item => item.Author == "Frank Herbert");
+        Console.WriteLine($"There are {byFrankHerbert.Count} books by Frank Herbert");
+
+        // Lets see how many items in the catalog are Lendable
+        Console.WriteLine("We have a mix of lendable and non-lendable items");
+
+        foreach(LibraryItem item in catalog.Lendable())
+        {
+            Console.WriteLine($"{item.Title}");
+        }
+
+
     }
 
 }
