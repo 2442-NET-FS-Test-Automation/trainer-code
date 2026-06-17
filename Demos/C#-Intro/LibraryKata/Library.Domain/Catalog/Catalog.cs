@@ -1,6 +1,8 @@
 namespace LibraryKata.Domain;
 
-public class Catalog
+// I've turned my Catalog class into a partial class
+// I can now stretch it's class definition across multiple files - when I build, all the content from all the files is stitched together
+public  partial class Catalog
 {
     // ENCAPSULATION change: these four collections used to be PUBLIC fields, so callers
     // reached straight in (catalog._items.Add(...)). That leaks the implementation - every
@@ -25,13 +27,29 @@ public class Catalog
     // A curated reading list we reorder often.
     private readonly LinkedList<LibraryItem> _readingList = new();
 
+    // HASHSET<T>: unique values, O(1) lookup. Adding a duplicate silently fails. 
+    // collection of all authors in my catalog
+    private readonly HashSet<string> _authors = new();
+
+    // -- Hashset surface -- 
+    public IReadOnlyCollection<string> Authors => _authors;
+
+
     // --- List surface ---
     // Wrapping Add/Remove/index is the whole point of encapsulation: callers state intent,
     // the Catalog decides how. Count was already exposed this way; now the rest is too.
     public int Count => _items.Count;
     public LibraryItem this[int index] => _items[index]; // indexer: read catalog[0] like an array, but read-only
-    public void Add(LibraryItem item) => _items.Add(item);
+    public void Add(LibraryItem item)
+    {   
+        _items.Add(item);
+        _authors.Add(item.Author); // Hashset will ignore duplicate authors
+    }
     public bool Remove(LibraryItem item) => _items.Remove(item);
+
+    // This syntax with the => is the "expression body syntax", if a method only runs a single expression (one line)
+    // then we can use this as a shorthand. The Compiler will infer the rest. 
+    public bool IsEmpty => _items.Count == 0;
 
     // --- Stack surface (return cart) ---
     public void DropInReturnCart(LibraryItem item) => _returnCart.Push(item);
