@@ -5,12 +5,14 @@
 * Angel Aranda Castillo, Miguel
 * Arce Flores, Victor Iyari
 * Barocio Rizo, Santino Alexandro
+* Nares Molina, Alan Ernesto
 
 ## Group 2
 
 * Daniel Gómez Gracián, Ignacio
 * Eduardo Quintero Gómez, Jesús
 * Eduardo Roque Sandoval, Martín
+* Rafael Alvarez Aceves, Hector
 
 ## Group 3
 
