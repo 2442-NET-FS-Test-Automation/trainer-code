@@ -25,7 +25,7 @@ not replacing it.
 
 What's new is **under the hood, plus one new command**: the entities move into the right collections, bad
 input and missing lookups fail loudly and get logged, lookups get fast, and a new command pulls **live data
-from a public API** (with an offline fallback). You are not writing four feature demos — you are growing
+from a public API**. You are not writing four feature demos — you are growing
 **one coherent app** whose menu commands now stand on production-grade internals.
 
 The next section says it as **user stories** — what a person running your app can do. Each story points at a
@@ -139,9 +139,9 @@ commits, and branches is your team's call.**
 - **Enrich from a live source.** *As a user, I can add or enrich an entity using real data fetched from a
   public online source, and the app stays responsive while it fetches.*
   - Accept: the fetched data shows up on the entity; the app does not freeze during the call.
-- **Works offline.** *As a user, if the network is down the feature still works from a local fallback instead
+- **Survive a network error.** *As a user, if the fetch fails the app reports it and keeps running instead
   of crashing.*
-  - Accept: with the network off, the command reports the fallback and still produces an entity.
+  - Accept: a failed fetch is logged and the command reports "nothing fetched"; the app does not crash.
 - **Reject bad input.** *As a user, the app refuses a malformed identifier before it saves anything.*
   - Accept: a wrongly-shaped id is rejected with a message; a well-shaped one is accepted.
 
@@ -172,7 +172,7 @@ User stories say *what*; these are the *how* your code must implement.
   `.Wait()`, **no** `async void`.
 - The fetched JSON is **deserialized** and your domain object is **built from the fields you read** (via your
   constructor or factory) — **no separate wire type** mirroring the API.
-- A foreseeable **`HttpRequestException`** is caught and handled (log + offline fallback) so a dead network
+- A foreseeable **`HttpRequestException`** is caught and handled (logged, returns nothing) so a dead network
   doesn't crash the run.
 - Validation uses a **`Regex`** (verbatim `@"..."`, anchored with `^` and `$`), plus at least one of: an
   **`out`** parameter, a **nullable** value type with `??`/lifted operator, or a **pattern-matching `switch`**.
@@ -191,7 +191,7 @@ The finished app must use **each** of these **somewhere** — you decide which s
 - [ ] `Dictionary<K,V>` + `TryGetValue` · `HashSet<T>`
 - [ ] `IEnumerable<T>` + `yield return` · lambda / `Predicate<T>` filter
 - [ ] expression-bodied member · `partial` **or** `sealed`
-- [ ] shared `HttpClient` + `async`/`await` · `HttpRequestException` handling + offline fallback
+- [ ] shared `HttpClient` + `async`/`await` · `HttpRequestException` handling
 - [ ] JSON deserialization (read the fields, build via your factory/constructor)
 - [ ] `Regex` validation · one of: `out` param / nullable + lifted operator / pattern-matching `switch`
 
