@@ -14,7 +14,7 @@ public class Program
     // public - accessible across the program
     // static - Main can be called upon without a Program object. It is a Static/class method. 
     // void - it doesn't return anything
-    public static void Main()
+    public static async Task Main()
     {   
         // Lets configure Serilog here before any code execution
         // Serilog works via a singleton object. Its shared globally
@@ -40,6 +40,7 @@ public class Program
         CollectionsDemo();
         ExceptionsDemo();
         AdvancedClassesDemo();
+        await AsyncHttpDemo();
 
         // In case there are any lingering logs by the time we hit line 41 above
         // Don't just stop execution, write the logs to their sink THEN close the program
@@ -444,4 +445,69 @@ public class Program
 
     }
 
+    public static async Task AsyncHttpDemo()
+    {
+        // We wrote our client object so lets use it
+        OpenLibraryClient client = new();
+
+        // Array to hold some isbns
+        string[] isbns = { "9780132350884", "9780201633610"};
+
+        // I want to fetch the data from OpenLibrary for both ISBNs 
+        // I do not want to sit here and type the same code calling the same method for both ISBNs
+        // I would end up awaiting two almost identical calls - thats valid but the curricula says "optimizing async code"
+        Task<LibraryItem?>[] fetchedBooks = new Task<LibraryItem?>[isbns.Length];
+
+        // Next, we loop through the array and call FetchByIdAsync - we use a traditional C-syntax for-loop
+        // because we care about indexes for this
+        for (int i = 0; i < isbns.Length; i++)
+        {
+            // Notice, this is an async method call - but we didn't await it. 
+            fetchedBooks[i] = client.FetchByIsbnAsync(isbns[i]);
+        }
+
+        // If we ONLY wanted one book, and we just had one isbn, we could do something like the following:
+        // foundBook = await client.FetchByIsbnAsync("1234567890123");
+
+        // In between starting the request on line 465, and the Task.WhenALl() call, I can do other stuff. I can call other methods.
+        // I can access other systems, etc. 
+
+
+        LibraryItem?[] foundBooks = await Task.WhenAll(fetchedBooks);
+
+        // This works, but what if there's nothing there?
+        //LibraryItem? firstBookFound = foundBooks[0];
+
+        // To be safe, we can use a quick ternary operator. Like a quick if-else check
+        // ternary syntax (some condition to check) ? trueValue : falseValue
+        LibraryItem? firstBookFound = foundBooks.Length > 0 ? foundBooks[0] : null;
+
+
+        // Using WhenAll to do concurrent fetching. If we didnt do this, and we awaited EVERY SINGLE call one by one
+        // Think about the amount of latency we'd be eating. 
+
+        Console.WriteLine($"Fetched: {firstBookFound?.Describe() ?? "nothing"}");
+
+
+        // Boxing and unboxing - mostly deprecated, replaced by Generics 
+        // Sometimes we needed to store value types on the heap, think of adding an int to a List. Before generics (List<T>)
+        // we had ArrayList to accomplish the same thing. Under the hood, an ArrayList couldn't accept value types. 
+        
+        // We have an int
+        int toBeBoxed = 6;
+
+        // We "box" it, by giving wrapping it in an object reference 
+        // So now it's on the heap 
+        object boxed = toBeBoxed; // This boxing process is somethong like 15-20x slower than just assigning an int
+
+        // Later, say, when we read something from the ArrayList into an int variable 
+        int unboxed = (int)boxed;
+
+        // How can we avoid this? 
+        // DON'T USE OLD NON GENERIC COLLECTIONS 
+        // List<T> is modern, uses generics, avoid box-unbox 
+        // ArrayList - deprecated, slow, uses boxing and unboxing
+
+
+    }
 }
