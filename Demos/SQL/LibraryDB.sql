@@ -224,8 +224,7 @@ INSERT INTO dbo.Member (FirstName, LastName, Email, JoinedDate) VALUES
     ('Dennis',  'Ritchie',  'dennis@example.com',  '2025-05-05');  -- 6
 GO
 
-INSERT INTO dbo.Book (Title, ISBN, PublishedYear, CategoryDescription, AuthorId, TotalCopies, AvailableCopies, Edition) VALUES
-    ('Clean Code',                         '9780132350884', 2008, 'Software',            1, 3, 3, 1),
+INSERT INTO dbo.Book (Title, ISBN, PublishedYear, CategoryName, AuthorId, TotalCopies, AvailableCopies, Edition) VALUES
     ('Clean Architecture',                 '9780134494166', 2017, 'Software',            1, 2, 2, 1),
     ('Refactoring',                        '9780201485677', 1999, 'Software',      2, 2, 1, 2),
     ('Patterns of Enterprise Application Architecture','9780321127426',2002,'Software', 2, 1, 1, 1),
