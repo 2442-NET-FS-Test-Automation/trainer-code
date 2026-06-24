@@ -236,3 +236,141 @@ INSERT INTO dbo.Book (Title, ISBN, PublishedYear, CategoryName, AuthorId, TotalC
     ('Programming Ruby',                   '9780974514055', 2004, 'Languages',           6, 1, 1, 1);
 GO
 
+INSERT INTO dbo.Loan (BookId, MemberId, DueDate, ReturnDate) VALUES
+    (6, 1, '2026-06-30', NULL);
+
+
+SELECT * FROM dbo.Author;
+SELECT * FROM dbo.Member;
+SELECT * FROM dbo.Book;
+
+-- We have some data in our DB - lets do some UPDATE 
+-- lets grab a book and give it a new Edition number
+UPDATE dbo.Book
+SET Edition = 2
+WHERE BookId = 3; -- If I leave this off, EVERY ROW gets that new value.
+
+-- I can also do calculations based on existing values inside the SET area
+UPDATE dbo.Book
+SET AvailableCopies = AvailableCopies - 1 -- removing a copy from circulation entirely
+WHERE BookId = 1;
+
+-- Lets remove a row 
+-- Same general rules as UPDATE - if you don't include a WHERE you have truncated the table
+DELETE FROM dbo.Member 
+WHERE Email = 'someone@nowhere.com'; -- don't forget the WHERE
+
+DELETE FROM dbo.Member 
+WHERE Email = 'dennis@example.com'; 
+
+DELETE FROM dbo.Author 
+WHERE AuthorId = 1;
+
+SELECT * FROM dbo.Author;
+
+GO
+-- DELETE FROM dbo.Book
+-- WHERE BookId = 6;
+
+-- DQL - SELECT to return data
+SELECT * FROM dbo.Book; -- The simplest select
+
+-- SELECT for specific columns
+SELECT Title, PublishedYear, AvailableCopies FROM dbo.Book;
+
+-- SELECT with a computed column, aliased with AS
+SELECT Title, TotalCopies - AvailableCopies AS CopiesOut FROM dbo.Book;
+
+
+
+-- Getting back everything from a table is fine, for our training. Usually, we want to be 
+-- more specific. 
+SELECT Title, PublishedYear
+FROM dbo.Book
+WHERE PublishedYear >= 2000; -- Using WHERE as a filter. 
+
+-- I can use things like BETWEEN, LIKE, and IS combined with my WHERE 
+-- to provide more complex/precise filtering logic
+
+-- I want just the title from every book published between 1999 and 2004
+SELECT Title
+FROM dbo.Book
+WHERE PublishedYear
+BETWEEN 1999 AND 2004;
+
+-- I want title, categoryname from every book who's category name is either software or testing
+SELECT Title, CategoryName
+FROM dbo.Book
+WHERE CategoryName
+IN ('Software', 'testing'); -- By default, many SQL RDBMS systems are case-insensitive for comparisons
+-- They render case, and when you return a value back to say a C# program, case is preserved. BUT
+-- when doing comparisons on the DB 'testing' = 'Testing' UNLESS we change the collation setting during Server creation
+
+-- I want every book title where the title starts with "Test"
+SELECT Title 
+FROM dbo.Book
+WHERE Title
+LIKE 'Test%';
+
+-- Last SELECT in this section 
+-- Give me every book title where the category is software AND available copies is greater than 1
+SELECT Title
+FROM dbo.Book
+WHERE CategoryName = 'Software' AND AvailableCopies > 1;
+
+-- Give me every book title where the PublishedYear was not provided (null)
+SELECT Title
+FROM dbo.Book
+WHERE PublishedYear IS NULL; -- If we are trying to do a comparison to assert that something
+-- is null, we don't use = . In SQL null doesnt equal anything. Its unknown, the absence of a value. 
+
+-- LIKE vs IN vs =
+-- = - matches one exact value
+-- IN - matches any value in the provided list
+-- LIKE - matches some pattern with wildcards %
+
+-- ORDER BY and DISTINCT
+-- We probably want to be able to order the returned records based on some logic
+-- atleast sometimes
+
+SELECT Title, PublishedYear
+FROM dbo.Book
+ORDER BY PublishedYear DESC, Title; -- By default, SQL order by ASC (if omitted, its ASC)
+
+-- Using Distinct
+-- Give me all the distinct category names that appear in dbo.Book
+SELECT DISTINCT CategoryName
+FROM dbo.Book
+ORDER BY CategoryName; -- ASC
+
+-- ORDER BY - sorts the output, by default in Ascending order. You can order by multiple keys,
+-- it uses subsequent keys to sort within some category.
+
+-- DISTINCT - removes duplicates from the result set. 
+
+-- GROUP BY and HAVING - a preview
+-- We are definitely coming back to this later this week.
+
+-- Give me the category name, and the count of books in that category
+-- where the count is more than 2. Order the results by book count descending
+SELECT CategoryName, COUNT(*) AS BookCount
+FROM dbo.Book
+GROUP BY CategoryName
+HAVING COUNT(*) > 2 -- I can't use an alias name in HAVING, either a column that exists, or some function
+ORDER BY BookCount DESC;
+
+-- GROUP BY CategoryName - Collapses all rows within that category into one group
+-- COUNT(*) - an aggregate function that counts the rows in each group
+-- We get back one line per categoryName, with the number of books in with that CategoryName
+
+-- GROUP BY vs DISTINCT
+-- DISTINCT is just straight de-duping. 
+-- GROUP BY lets you run computation against the groups. Count how many per group for example. 
+
+-- HAVING vs WHERE
+-- HAVING filters groups in a GROUP BY
+-- WHERE filters rows.
+
+-- If I have a SELECT that blends WHERE, GROUP BY and HAVING 
+-- WHERE runs before any grouping, and filters the raw rows that are then passed 
+-- to GROUP BY, then HAVING filters the groups. 
