@@ -359,6 +359,8 @@ GROUP BY CategoryName
 HAVING COUNT(*) > 2 -- I can't use an alias name in HAVING, either a column that exists, or some function
 ORDER BY BookCount DESC;
 
+GO
+
 -- GROUP BY CategoryName - Collapses all rows within that category into one group
 -- COUNT(*) - an aggregate function that counts the rows in each group
 -- We get back one line per categoryName, with the number of books in with that CategoryName
@@ -374,3 +376,142 @@ ORDER BY BookCount DESC;
 -- If I have a SELECT that blends WHERE, GROUP BY and HAVING 
 -- WHERE runs before any grouping, and filters the raw rows that are then passed 
 -- to GROUP BY, then HAVING filters the groups. 
+
+-- ---- DROP: children before parents ----------------------------------------------
+DROP TABLE IF EXISTS dbo.Loan;
+DROP TABLE IF EXISTS dbo.BookAuthor;
+DROP TABLE IF EXISTS dbo.Book;
+DROP TABLE IF EXISTS dbo.Member;
+DROP TABLE IF EXISTS dbo.Author;
+DROP TABLE IF EXISTS dbo.Category;
+GO
+
+-- ---- CREATE normalized: parents before children ---------------------------------
+-- NEW: Category is now its own entity (was the free-text Book.CategoryName).
+CREATE TABLE dbo.Category
+(
+    CategoryId  INT IDENTITY(1,1) NOT NULL,
+    Name        VARCHAR(60)  NOT NULL,
+    Description VARCHAR(200) NULL,
+    CONSTRAINT PK_Category PRIMARY KEY (CategoryId),
+    CONSTRAINT UQ_Category_Name UNIQUE (Name)
+);
+
+CREATE TABLE dbo.Author
+(
+    AuthorId  INT IDENTITY(1,1) NOT NULL,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName  VARCHAR(50) NOT NULL,
+    BirthYear INT NULL,
+    CONSTRAINT PK_Author PRIMARY KEY (AuthorId),
+    CONSTRAINT CK_Author_BirthYear CHECK (BirthYear IS NULL OR BirthYear BETWEEN 300 AND 2050)
+);
+
+CREATE TABLE dbo.Member
+(
+    MemberId   INT IDENTITY(1,1) NOT NULL,
+    FirstName  VARCHAR(50)  NOT NULL,
+    LastName   VARCHAR(50)  NOT NULL,
+    Email      VARCHAR(125) NOT NULL,
+    JoinedDate DATE NOT NULL CONSTRAINT DF_Member_JoinedDate DEFAULT (GETDATE()),
+    CONSTRAINT PK_Member PRIMARY KEY (MemberId),
+    CONSTRAINT UQ_Member_Email UNIQUE (Email)
+);
+
+-- CHANGED: Book now carries CategoryId (FK) instead of CategoryName, and has NO AuthorId
+-- (authorship lives in the BookAuthor bridge). Edition and the wider Title are folded into
+-- CREATE rather than added later with ALTER.
+CREATE TABLE dbo.Book
+(
+    BookId          INT IDENTITY(1,1) NOT NULL,
+    Title           VARCHAR(250) NOT NULL,
+    ISBN            CHAR(13) NOT NULL,
+    PublishedYear   INT NULL,
+    CategoryId      INT NOT NULL,
+    TotalCopies     INT NOT NULL CONSTRAINT DF_Book_TotalCopies     DEFAULT (1),
+    AvailableCopies INT NOT NULL CONSTRAINT DF_Book_AvailableCopies DEFAULT (1),
+    Edition         INT NOT NULL CONSTRAINT DF_Book_Edition         DEFAULT (1),
+    CONSTRAINT PK_Book PRIMARY KEY (BookId),
+    CONSTRAINT UQ_Book_ISBN UNIQUE (ISBN),
+    CONSTRAINT CK_Book_Copies CHECK (TotalCopies >= AvailableCopies),
+    CONSTRAINT FK_Book_Category FOREIGN KEY (CategoryId) REFERENCES dbo.Category (CategoryId)
+);
+
+-- NEW: the M:N bridge between Book and Author. Composite PK, no extra attributes.
+CREATE TABLE dbo.BookAuthor
+(
+    BookId   INT NOT NULL,
+    AuthorId INT NOT NULL,
+    CONSTRAINT PK_BookAuthor PRIMARY KEY (BookId, AuthorId),
+    CONSTRAINT FK_BookAuthor_Book   FOREIGN KEY (BookId)   REFERENCES dbo.Book   (BookId)   ON DELETE CASCADE,
+    CONSTRAINT FK_BookAuthor_Author FOREIGN KEY (AuthorId) REFERENCES dbo.Author (AuthorId) ON DELETE CASCADE
+);
+
+CREATE TABLE dbo.Loan
+(
+    LoanId     INT IDENTITY(1,1) NOT NULL,
+    BookId     INT NOT NULL,
+    MemberId   INT NOT NULL,
+    LoanDate   DATE NOT NULL CONSTRAINT DF_Loan_LoanDate DEFAULT (GETDATE()),
+    DueDate    DATE NOT NULL,
+    ReturnDate DATE NULL,
+    CONSTRAINT PK_Loan PRIMARY KEY (LoanId),
+    CONSTRAINT FK_Loan_Book   FOREIGN KEY (BookId)   REFERENCES dbo.Book   (BookId),
+    CONSTRAINT FK_Loan_Member FOREIGN KEY (MemberId) REFERENCES dbo.Member (MemberId),
+    CONSTRAINT CK_Loan_Dates  CHECK (DueDate >= LoanDate)
+);
+GO
+
+
+-- ---- SEED normalized: parents before children -----------------------------------
+-- Category rows are seeded directly (no SELECT DISTINCT off Book, since Book no longer
+-- holds the name). Comments mark the IDENTITY value each row receives.
+INSERT INTO dbo.Category (Name, Description) VALUES
+    ('Software',  'Software design and craftsmanship'),  -- 1
+    ('Testing',   'Testing and TDD'),                    -- 2
+    ('Process',   'Process and methodology'),            -- 3
+    ('Languages', 'Programming languages');              -- 4
+
+INSERT INTO dbo.Author (FirstName, LastName, BirthYear) VALUES
+    ('Robert', 'Martin', 1952),   -- 1
+    ('Martin', 'Fowler', 1963),   -- 2
+    ('Kent',   'Beck',   1961),   -- 3
+    ('Erich',  'Gamma',  1961),   -- 4
+    ('Andrew', 'Hunt',   1964),   -- 5
+    ('David',  'Thomas', 1956);   -- 6
+
+INSERT INTO dbo.Member (FirstName, LastName, Email, JoinedDate) VALUES
+    ('Ada',     'Lovelace', 'ada@example.com',      '2025-01-10'),  -- 1
+    ('Grace',   'Hopper',   'grace@example.com',    '2025-02-02'),  -- 2
+    ('Alan',    'Turing',   'alan@example.com',     '2025-02-20'),  -- 3
+    ('Linus',   'Torvalds', 'linus@example.com',    '2025-03-15'),  -- 4
+    ('Margaret','Hamilton', 'margaret@example.com', '2025-04-01'),  -- 5
+    ('Dennis',  'Ritchie',  'dennis@example.com',   '2025-05-05');  -- 6
+
+-- Book references CategoryId (1=Software, 2=Testing, 3=Process, 4=Languages); no author column.
+INSERT INTO dbo.Book (Title, ISBN, PublishedYear, CategoryId, TotalCopies, AvailableCopies, Edition) VALUES
+    ('Clean Code',                                     '9780132350885', 2008, 1, 3, 3, 1),  -- 1
+    ('Clean Architecture',                             '9780134494166', 2017, 1, 2, 2, 1),  -- 2
+    ('Refactoring',                                    '9780201485677', 1999, 1, 2, 1, 2),  -- 3
+    ('Patterns of Enterprise Application Architecture','9780321127426', 2002, 1, 1, 1, 1),  -- 4
+    ('Test Driven Development',                        '9780321146533', 2002, 2, 2, 2, 1),  -- 5
+    ('Extreme Programming Explained',                  '9780321278654', 2004, 3, 1, 0, 2),  -- 6
+    ('Design Patterns',                                '9780201633610', 1994, 1, 2, 2, 1),  -- 7
+    ('The Pragmatic Programmer',                       '9780201616224', 1999, 1, 4, 3, 1),  -- 8
+    ('The Pragmatic Programmer 20th Anniv',            '9780135957059', 2019, 1, 2, 2, 2),  -- 9
+    ('Programming Ruby',                               '9780974514055', 2004, 4, 1, 1, 1);  -- 10
+
+-- Authorship via the bridge: the original one-author-per-book links, then real co-authors.
+INSERT INTO dbo.BookAuthor (BookId, AuthorId) VALUES
+    (1, 1), (2, 1), (3, 2), (4, 2), (5, 3),     -- original single-author links
+    (6, 3), (7, 4), (8, 5), (9, 5), (10, 6),
+    (7, 3),   -- Design Patterns co-authored (Beck)
+    (8, 6);   -- The Pragmatic Programmer co-authored (Thomas)
+
+INSERT INTO dbo.Loan (BookId, MemberId, LoanDate, DueDate, ReturnDate) VALUES
+    (3, 1, '2026-06-01', '2026-06-15', NULL),         -- Refactoring, out to Ada
+    (6, 2, '2026-05-20', '2026-06-03', NULL),         -- XP Explained, out to Grace (0 available)
+    (8, 3, '2026-05-25', '2026-06-08', '2026-06-04'), -- Pragmatic Programmer, returned
+    (1, 4, '2026-06-10', '2026-06-24', NULL),         -- Clean Code, out to Linus
+    (8, 5, '2026-06-12', '2026-06-26', NULL);         -- Pragmatic Programmer, out to Margaret
+GO

@@ -19,7 +19,7 @@ erDiagram
         varchar  Title
         char     ISBN UK
         int      PublishedYear
-        varchar  Category
+        varchar  CategoryName
         int      AuthorId FK
         int      TotalCopies
         int      AvailableCopies
