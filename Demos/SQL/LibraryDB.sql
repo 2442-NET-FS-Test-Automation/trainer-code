@@ -515,3 +515,152 @@ INSERT INTO dbo.Loan (BookId, MemberId, LoanDate, DueDate, ReturnDate) VALUES
     (1, 4, '2026-06-10', '2026-06-24', NULL),         -- Clean Code, out to Linus
     (8, 5, '2026-06-12', '2026-06-26', NULL);         -- Pragmatic Programmer, out to Margaret
 GO
+
+-- JOINS and intermediate DQL -- 
+
+-- Aggregate functions
+-- An aggregate collapses many rows into one sumber
+-- COUNT() - 4 - COUNT(*) is different from COUNT(some_column) - when you COUNT() a specific column, NULLS are ignored
+-- SUM() - get the sum total stored in a column across many rows
+-- AVG() - get the average value stored in a column across many rows - skip nulls 
+-- MIN(), MAX()
+
+SELECT COUNT(*) AS BookCount, SUM(TotalCopies) AS TotalCopies, 
+        AVG(TotalCopies) AS AvgCopies, MIN(PublishedYear) AS Oldest, 
+        MAX(PublishedYear) AS Newest 
+FROM dbo.Book;
+
+-- Scalar functions - transform a value into a new value, per row. 
+SELECT UPPER(LastName) AS LastUpper,
+        LEN(Email) AS EmailLen,
+        CONCAT(FirstName, ' ', LastName) AS FullName,
+        DATEDIFF(DAY, JoinedDate, GETDATE()) AS DaysAMember-- Takes 3 arguments, the datepart (year difference, day difference, etc)
+FROM dbo.Member;                                    -- start date, end date
+
+
+-- SQL Joins --
+-- JOINs - JOINs are one way to get information from multiple tables in the same query.
+-- INNER JOIN (the default join)
+-- LEFT and RIGHT JOINs
+-- OUTER JOINs (LEFT, RIGHT, FULL)
+-- CROSS JOINs
+
+-- books with their categories (FK = PK)
+-- This is an example of an equi-join - we join on an equality comparison
+SELECT b.Title, c.Name AS Category
+FROM dbo.Book AS b
+INNER JOIN dbo.Category AS c ON c.CategoryId = b.CategoryId -- the join condition 
+ORDER BY c.Name, b.Title;
+
+-- Lets do a join across a many to many
+-- I want stuff from Authors and Books - I need to traverse BookAuthor
+
+-- books with ALL their authors, through the join table
+SELECT b.Title, a.FirstName + ' ' + a.LastName AS Author
+FROM dbo.Book AS b
+JOIN dbo.BookAuthor ba ON ba.BookId = b.BookId
+JOIN dbo.Author a ON a.AuthorId = ba.AuthorId
+ORDER BY b.Title, Author;
+
+
+-- GROUP BY + HAVING with JOINs
+-- I want the name, total books in, and total copies across all books in: A category
+SELECT c.Name AS Category, COUNT(*) AS Books, SUM(b.TotalCopies) AS Copies
+FROM dbo.Book b
+JOIN dbo.Category c ON c.CategoryId = b.CategoryId
+GROUP BY c.Name
+HAVING COUNT(*) > 0
+ORDER BY Books DESC;
+
+-- GROUP BY returns one row in the result PER GROUP
+-- Aggregates collapse all rows in a group into a single value
+-- A bare column, would have many possible values per group. 
+
+-- LEFT and RIGHT joins 
+
+-- LEFT JOIN - we want all records from the left table, and matching records from the right
+-- every member and their loans, if they have any. Members with no loans will still appear
+SELECT m.FirstName, m.LastName, l.LoanId, l.DueDate
+FROM dbo.Member AS m -- left table
+LEFT JOIN dbo.Loan AS l ON l.MemberId = m.MemberId -- right table
+ORDER BY m.LastName;
+
+-- These can be useful for filtering based on those nulls
+SELECT m.FirstName, m.LastName
+FROM dbo.Member AS m 
+LEFT JOIN dbo.Loan AS l ON l.MemberId = m.MemberId
+WHERE l.LoanId IS NULL;
+
+-- RIGHT JOIN: mirror of left join
+-- every book and their loans if it exists
+SELECT b.Title, l.LoanId
+FROM dbo.Loan AS l   
+RIGHT JOIN dbo.Book AS b ON b.BookId = l.BookId
+ORDER BY b.Title;
+
+-- FULL OUTER vs CROSS 
+-- FULL OUTER JOIN - Returns matched rows where they exist, as well as unmatched rows
+SELECT b.Title, c.Name AS Category
+FROM dbo.Book b
+FULL OUTER JOIN dbo.Category c ON c.CategoryId = b.CategoryId
+ORDER BY c.Name;
+
+-- CROSS JOIN - not common. Cartesian product
+-- Every possible combination of the rows in both tables
+-- very rare
+SELECT a.LastName, c.Name
+FROM dbo.Author a
+CROSS JOIN dbo.Category c; 
+
+
+-- Subqueries
+-- A subquery is a query inside another query
+-- Use a join to combine columns from multiple tables into the output
+-- Use a subquery to filter against a computer value or set you DONT need in the output
+-- Realistically, you can usually use either - typically the JOIN will be easier to write
+
+-- scalar subquery: books that have more copies than average
+SELECT Title, TotalCopies
+FROM dbo.Book
+WHERE TotalCopies > ( SELECT AVG(TotalCopies) FROM dbo.Book );
+
+-- IN-subquery: members who currently have a book lent out
+-- Notice - we did the opposite earlier with a JOIN, this could also 
+-- simply be a join
+SELECT FirstName, LastName
+FROM dbo.Member
+WHERE MemberId IN
+(
+    SELECT MemberId
+    FROM dbo.Loan
+    WHERE ReturnDate IS NULL
+);
+
+-- correlated subquery: this one can cause you issues.
+SELECT Title, TotalCopies
+FROM dbo.Book b1 
+WHERE TotalCopies > (
+    SELECT AVG(TotalCopies)
+    FROM dbo.Book b2
+    WHERE b1.PublishedYear = b2.PublishedYear
+)
+
+-- correlated subquery: loan count per book - computed by row
+SELECT b.Title,
+        (SELECT COUNT(*) FROM dbo.Loan l WHERE l.BookId = b.BookId) AS TimesLoaned
+FROM dbo.Book b
+ORDER BY TimesLoaned DESC;
+
+-- Lets make a dashboard 
+-- I want every currently out loan (loans with a null), with member, book, category, and how late the book is
+SELECT m.FirstName + ' ' + m.LastName AS Member,
+        b.Title,
+        c.Name as Category,
+        l.DueDate,
+        DATEDIFF(DAY, l.DueDate, GETDATE()) AS DaysOverdue
+FROM dbo.Loan AS l    
+JOIN dbo.Member AS m ON m.MemberId = l.MemberId
+JOIN dbo.Book AS b ON b.BookId = l.BookId
+JOIN dbo.Category AS c ON c.CategoryId = b.CategoryId
+WHERE l.ReturnDate IS NULL 
+ORDER BY DaysOverdue DESC;
