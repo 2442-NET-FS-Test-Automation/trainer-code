@@ -35,7 +35,7 @@ ORDER BY - sort the data
 -- Retrieve a list of all countries in billing addresses on invoices
 
 
--- Retrieve how many invoices there were in 2009, and what was the sales total for that year?
+-- Retrieve how many invoices there were in 2021, and what was the sales total for that year?
 
 -- (challenge: find the invoice count sales total for every year using one query)
 
@@ -62,13 +62,13 @@ ORDER BY - sort the data
 -- Show all invoices together with the name of the sales agent for each one
 
 
--- Which sales agent made the most sales in 2009?
+-- Which sales agent made the most sales in 2021?
 
 
 -- How many customers are assigned to each sales agent?
 
 
--- Which track was purchased the most in 2010?
+-- Which track was purchased the most in 2022?
 
 
 -- Show the top three best selling artists.
