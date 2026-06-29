@@ -723,3 +723,13 @@ END CATCH
     -- deleting OR inserting in date within the read range until your transaction finishes. This
     -- prevents ALL concurrency anomalies - and is also slow as hell. SQL Server has to create
     -- manage and delete alot of locks. You can also create deadlocks. 
+
+-- Fixing my error from before + constraint fix
+
+-- Reset copies
+UPDATE dbo.Book SET AvailableCopies = 0 WHERE BookId = 6;
+
+-- Add constraint
+ALTER TABLE dbo.Book
+ADD CONSTRAINT CK_Book_Min_AvailableCopies
+CHECK (AvailableCopies >= 0);
