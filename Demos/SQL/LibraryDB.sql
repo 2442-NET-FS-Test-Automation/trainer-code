@@ -664,3 +664,62 @@ JOIN dbo.Book AS b ON b.BookId = l.BookId
 JOIN dbo.Category AS c ON c.CategoryId = b.CategoryId
 WHERE l.ReturnDate IS NULL 
 ORDER BY DaysOverdue DESC;
+
+GO
+-- Transactions - All of this runs or NONE of it succeeds
+-- At its most basic a Transaction is just BEGIN and COMMIT
+-- BUT we want to account for things going wrong gracefull - even if 
+-- an error or exception WONT bring the database down.
+
+-- SQL despite not being a programming language - has TRY and CATCH
+
+-- SQL Server is an application. It, like any other applications, can have runtime errors
+-- This flag below, causes SQL Server to abort any transaction when an error surfaces. 
+-- Put it right before your try catch - this is SQL Server Specific
+SET XACT_ABORT ON; -- SQL Server specific flag 
+
+BEGIN TRY -- A little verbose but it works. 
+    BEGIN TRANSACTION -- we put our transaction in here. 
+        -- The logic of our transaction goes here below
+
+        -- Member 2 checks out book 1
+        INSERT INTO dbo.Loan(BookId, MemberId, DueDate)
+        VALUES (6, 2, DATEADD(DAY, 14, GETDATE())) -- Using Dateadd to generate a due date
+
+        -- So we did an insert - now let's do an update
+        -- Book 1 Available copies decremented
+        UPDATE dbo.Book SET AvailableCopies = AvailableCopies - 1 WHERE BookId = 6;
+    COMMIT TRANSACTION -- If we make it here, both writes become persisted
+    PRINT 'Checkout COMMITTED'
+END TRY
+BEGIN CATCH 
+    -- If something goes wrong we can detect it and roll back 
+    -- IF we make it to the CATCH, something has gone wrong. Either a runtime error
+    -- OR some sort of constraint or data integrity violation, like trying to create orphan records
+    -- The transaction remains open on this connection - we check to see if by the time we hit the catch
+    -- any transactions ARE open. If there are, we want to abort them - roll them back. 
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    PRINT 'Checkout ROLLED BACK: ' + ERROR_MESSAGE();
+END CATCH
+
+-- Every transaction ends in either a COMMIT or a ROLLBACK - you must provide logic for both.
+-- If you have a bunch of branching paths keep that in mind. 
+
+-- Isolation levels - largely managed by the RDBMS that runs our Database
+-- but we have some options. We can, if we want to, 
+-- set the isolation level
+
+-- In SQL Server there are four options (that we will worry about): 
+-- READ UNCOMMITTED - Queries and statements can read data rows modified by other transactions
+    -- that are yet to be committed. Does not issue shared locks or honor exclusive locks.
+    -- Can accidentally result in dirty (untrue) reads, and phantom reads on records that wont exist 
+    -- once that other transaction finishes.
+-- READ COMMITTED (Default) - Prevents dirty reads by requiring that data read by a statement must be 
+    -- committed before it is processed. 
+-- REPEATABLE READ - Places shared locks on all data read by transaction and HOLDS THEM until the entire transaction
+    -- No other transaction can modify or delete these rows during this time. Prevents some dirty reads, 
+    -- BUT other transactions can insert new rows that may bleed into your filtering for queries 
+-- SERIALIZABLE -- Most restrictive. Places locks on rows that prevent other transactions from updating
+    -- deleting OR inserting in date within the read range until your transaction finishes. This
+    -- prevents ALL concurrency anomalies - and is also slow as hell. SQL Server has to create
+    -- manage and delete alot of locks. You can also create deadlocks. 
