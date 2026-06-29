@@ -733,3 +733,106 @@ UPDATE dbo.Book SET AvailableCopies = 0 WHERE BookId = 6;
 ALTER TABLE dbo.Book
 ADD CONSTRAINT CK_Book_Min_AvailableCopies
 CHECK (AvailableCopies >= 0);
+
+GO
+
+-- VIEWS, INDEXES, STORED PROCEDURES and more. 
+-- Views are like saved queries. Think back to that large triple join we did 
+-- on DQL day. We can take something like that, that is annoying write or think of over and over again
+-- and we can save it as a View. Then we can query the view as if it was a table. 
+
+CREATE OR ALTER VIEW dbo.vw_ActiveLoans
+AS
+    SELECT m.FirstName + ' ' + m.LastName AS Member,
+        b.Title,
+        c.Name as Category,
+        l.DueDate,
+        DATEDIFF(DAY, l.DueDate, GETDATE()) AS DaysOverdue
+    FROM dbo.Loan AS l    
+    JOIN dbo.Member AS m ON m.MemberId = l.MemberId
+    JOIN dbo.Book AS b ON b.BookId = l.BookId
+    JOIN dbo.Category AS c ON c.CategoryId = b.CategoryId
+    WHERE l.ReturnDate IS NULL;
+
+GO
+
+-- This is not a saved precompiled dataset. There is something called an indexed view
+-- that is outside of our scope that is precompiled. But a VIEW like the one above, a regular VIEW
+-- is just a saved select. The data updates to be current whenever you call upon it. 
+SELECT * FROM dbo.vw_ActiveLoans ORDER BY DueDate;
+
+GO
+
+-- Increasing in complexity and potential usefulness
+-- We have Stored procedures - a named program in the database. Parameters/arguments, logic, 
+-- transaction wrapping and limited/optional returns 
+CREATE OR ALTER PROCEDURE dbo.usp_CheckoutBook
+    -- This first section between CREATE and AS holds your arguments/inputs
+    @BookId INT,
+    @MemberId INT,
+    @Days INT = 14 -- how long is the loan for, default 14
+AS
+BEGIN
+    SET XACT_ABORT ON;
+    SET NOCOUNT ON; -- turns off the "x rows affected message print"
+
+    BEGIN TRY
+        BEGIN TRANSACTION
+            -- We want to check if there are copies available to be checked out
+            IF (SELECT AvailableCopies FROM dbo.Book WHERE BookId = @BookId ) <= 0
+                -- Manually throwing an error in SQL Server. 
+                -- THROW takes 3 arguments
+                    -- error_number - some integer representing the exception, must be 50000 or higher
+                    -- message - some string describing the error
+                    -- state - an int between 0 and 255 describing where the error originated
+                THROW 50000, 'No copies available to check out.', 1;
+
+            INSERT INTO dbo.Loan (BookId, MemberId, DueDate)
+            VALUES (@BookId, @MemberId, DATEADD(DAY, @Days, GETDATE()));
+
+            UPDATE dbo.Book SET AvailableCopies = AvailableCopies - 1 WHERE BookId = @BookId;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW; -- bubbling up the Try block error to wherever my stored procedure was called
+    END CATCH
+END;
+GO
+
+EXEC dbo.usp_CheckoutBook @BookId = 1, @MemberId = 3, @Days = 21;
+
+SELECT * FROM dbo.Loan WHERE BookId = 1 AND MemberId = 3;
+
+GO
+-- Stored Procedure vs User Defined Function
+-- A stored procedure DOES something. Writes, transactions, returning result sets, etc. Called with EXEC.
+-- A function (user defined or otherwise) computes a value. Its called INSIDE a query, and it itself
+-- does not change the data in the database. 
+
+-- User defined function
+CREATE OR ALTER FUNCTION dbo.fn_DaysOverdue (@dueDate DATE)
+RETURNS INT
+AS 
+BEGIN
+    -- Declaring a variable in SQL that is scoped to this function
+    DECLARE @days INT = DATEDIFF(DAY, @dueDate, CAST(GETDATE() AS DATE));
+    -- IF days is greater than 0 (the book is overdue) - return that value
+    -- IF days is 0 (or less somehow) return 0 instead
+    RETURN CASE WHEN @days > 0 THEN @days ELSE 0 END;
+END;
+GO
+
+SELECT b.Title, l.DueDate, dbo.fn_DaysOverdue(DueDate) AS DaysOverdue
+FROM dbo.Loan l
+JOIN dbo.Book b ON b.BookId = l.BookId
+WHERE ReturnDate is NULL;
+
+
+-- Indexes - a lookup structure like an index ina  book. 
+-- You create it on certain columns in a table, to allow lookup on that column
+-- without the DB engine having to scan row by row. 
+
+-- Trading READ speed for WRITE speed
+CREATE INDEX IX_Loan_MemberId ON dbo.Loan (MemberId);
