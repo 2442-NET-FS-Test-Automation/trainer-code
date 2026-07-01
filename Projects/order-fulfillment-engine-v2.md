@@ -1,6 +1,5 @@
 # Project — Order Fulfillment Service (Solo, Weeks 4–5) — **Minimal-API edition**
 
-
 ## Objective
 
 Build **one coherent, production-shaped backend service**: an **Order Fulfillment Service** — a **Minimal-API**
@@ -16,8 +15,7 @@ You build this **solo**, across **Weeks 4–5**, and **present it live on Friday
 
 Everything you need is taught by **end of Week 4**: C# + OOP (Wk1–2), collections/generics/exceptions/patterns/
 Serilog (Wk2), SQL — schema, joins, transactions, ACID, isolation, indexes (Wk3), and **EF Core, LINQ, data
-structures, and multithreading served from a Minimal API (Wk4)**. The API is **Minimal API** — controllers,
-DTOs over an MVC controller, and a front end are **Project 2 (Wk6–7)** and explicitly **out of scope here**.
+structures, and multithreading served from a Minimal API (Wk4)**. The API is **Minimal API** — controllers
 
 ---
 
@@ -94,12 +92,14 @@ Each story is a behavior an operator (or a stakeholder watching) can **see** at 
 are what you point at on Friday.
 
 ### Catalog & inventory
+
 - **Seed and inspect.** *As an operator, I can seed a catalog of products with starting stock and list current
   on-hand quantities at any time.*
   - Accept: `POST /seed` then `GET /inventory` shows each product + starting quantity; re-listing after a burst
     reflects the drawn-down numbers.
 
 ### Concurrent fulfillment (the core)
+
 - **Fulfill a burst concurrently.** *As an operator, I can submit a burst of N orders and the service fulfills
   them concurrently while the API stays responsive.*
   - Accept: `POST /orders/burst` returns immediately; order statuses move from Pending to a terminal state over
@@ -116,6 +116,7 @@ are what you point at on Friday.
     (visible by completion order / timestamps).
 
 ### Resilience & observability
+
 - **Graceful shutdown.** *As an operator, I can stop the service and it finishes or safely abandons in-flight
   work and flushes its logs — no lost or half-applied order.*
   - Accept: on shutdown, no order is left partial (inventory decremented but order not marked, or vice versa);
@@ -125,6 +126,7 @@ are what you point at on Friday.
     (order id, product, quantity) — never string concatenation.
 
 ### Reporting & analysis
+
 - **Reports.** *As a stakeholder, I can see top products and top customers by volume, and the overall
   fulfillment-vs-backorder rate.*
   - Accept: `GET /reports/top-products`, `/reports/top-customers`, `/reports/fulfillment-rate` return different
@@ -139,6 +141,7 @@ are what you point at on Friday.
 ## Engineering Definition of Done (how you build it)
 
 ### Web surface (Minimal API)
+
 - A **Minimal-API host** (`dotnet new web`) exposing the operator endpoints above with `MapGet`/`MapPost`,
   route + query + body **model binding**, and correct **status codes** (200 / 201 / 202 / 400 / 404 / 409).
 - The `DbContext` is **registered in DI** (`AddDbContext` / `AddDbContextFactory`) and resolved per request —
@@ -146,6 +149,7 @@ are what you point at on Friday.
   controllers.)
 
 ### Data layer (EF Core, code-first, SQL Server)
+
 - A **code-first** EF Core model — normalized to **3NF**, FKs + referential integrity:
   - `Customer` (id, name, unique email)
   - `Product` (id, **unique indexed SKU**, name, `decimal(10,2)` price)
@@ -159,6 +163,7 @@ are what you point at on Friday.
 - Persistence goes through a **repository behind an interface**; callers depend on the interface, not EF types.
 
 ### Concurrency (the headline)
+
 - Fulfill a burst with the **simplest correct** approach: a set of `Task`s (`Task.WhenAll` / `Parallel.ForEach`)
   over the burst, **each task its own `DbContext`** (from the factory — `DbContext` is **not thread-safe**; one
   per order fulfilled, disposed when done — **not** one per worker).
@@ -172,6 +177,7 @@ are what you point at on Friday.
   silently.
 
 ### Data structures & the benchmark (DSA)
+
 - A report is **sorted** and you can **binary search** the sorted result (find a product's rank).
 - Inventory/customer lookups go through a **hash-based** structure (`Dictionary` / `ConcurrentDictionary`), not
   a linear scan.
@@ -179,6 +185,7 @@ are what you point at on Friday.
   fits.
 
 ### Cross-cutting
+
 - **Serilog** configured **once** at startup and flushed on exit, **structured-template** form
   (`Log.Information("Fulfilled {OrderId} x{Qty} of {Sku}", ...)`), never string concatenation.
 - A **Factory** builds orders/order-lines (rejecting an unknown kind in its `default` arm); the **repository**
@@ -212,6 +219,7 @@ logging · a **custom exception** that carries data, handled specific-before-bas
 be simple at the Floor.
 
 ### Floor — MVP (must ship; the graded core)
+
 - EF Core model + **migrations + seed** (catalog **and customers**) against SQL Server in Docker, `DbContext` in
   DI.
 - Minimal-API endpoints: `POST /seed`, `POST /orders/burst`, `GET /inventory`, **one** report.
@@ -222,6 +230,7 @@ be simple at the Floor.
 - **Serilog** structured logging; README writeup mapping each technique to the type that proves it.
 
 ### Target — the intended build (aim here)
+
 - **Expedited priority** via a **`PriorityQueue<T>`** (expedited drained first).
 - **Benchmark done right:** reset inventory between runs, print both timings + a speedup factor.
 - **`CancellationToken` graceful stop** + per-task exception handling — no half-applied order, `CloseAndFlush`.
@@ -229,9 +238,10 @@ be simple at the Floor.
 - **Repository behind an interface** + a **Factory**; a **custom exception** that carries data.
 
 ### Stretch / honors — only after Target is green
+
 - **The original console worker-pool engine**: swap `Task.WhenAll` for a bounded **`BlockingCollection<T>`
   producer-consumer worker pool** with N persistent workers (see the kept `order-fulfillment-engine-README.md`
-  + `order-fulfillment-engine-minimal-path.md` for that ladder).
+  - `order-fulfillment-engine-minimal-path.md` for that ladder).
 - **Optimistic-vs-lock A/B**; a true two-lane expedited queue; a SQL **view/proc** via EF `FromSql`; a second
   Serilog sink; an **isolation-level experiment** (raise it, watch throughput fall).
 
@@ -246,6 +256,7 @@ be simple at the Floor.
 **In the repo:** the application in its final state + migrations + seed + the README writeup.
 
 **Live demo (Fri Jul 10):**
+
 1. `POST /seed`; `GET /inventory`.
 2. `POST /orders/burst` with demand **exceeding** stock; let it process.
 3. **Prove no overselling** — on-hand never negative; units-fulfilled == units-depleted.
