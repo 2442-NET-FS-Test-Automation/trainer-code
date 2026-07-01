@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Library.Data.Entities;
+using System.Dynamic;
+using System.Data.Common;
 
 namespace Library.Data;
 
@@ -18,6 +20,12 @@ public class LibraryDbContext : DbContext
     // Reminder - these Entities become our tables. We register the entities here. 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<InventoryItem> Inventory => Set<InventoryItem>();
+
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderLine> OrderLines => Set<OrderLine>();
+    public DbSet<FulfillmentEvent> FulfillmentEvents { get; set; }
+
 
     // If I want to do things like deeper configurations options or data seeding
     // I can override a method we inherited from DbContext
@@ -44,6 +52,15 @@ public class LibraryDbContext : DbContext
 
         });
 
+        // Setting our RowVersion property as an EF Core Row Version
+        b.Entity<InventoryItem>().Property(i => i.RowVersion).IsRowVersion();
+
+        //This order of operations, setting string length and then telling DB that a column
+        // is unique is specific to strings + SQL Server. 
+        b.Entity<Customer>().Property(c => c.Email).HasMaxLength(256); //Setting length of email first...
+        b.Entity<Customer>().HasIndex(c => c.Email).IsUnique();
+
+
         // After you've configured your entities (if you do any config in the override)
         // we can use OnModelCreating to seed data
         b.Entity<Product>().HasData(
@@ -56,6 +73,13 @@ public class LibraryDbContext : DbContext
             new InventoryItem { Id = 1, ProductId = 1, CurrentStock = 5},
             new InventoryItem { Id = 2, ProductId = 2, CurrentStock = 3},
             new InventoryItem { Id = 3, ProductId = 3, CurrentStock = 8}
+        );
+
+        // HasData runs inside the migration BEFORE SQL Server can hand out identity keys
+        // Which is why we give explicit PK's when seeding
+        b.Entity<Customer>().HasData(
+            new Customer { Id = 1, Name = "Ada Lovelace", Email = "ada@example.com"},
+            new Customer { Id = 2, Name = "Alan Turing", Email = "alan@example.com"}
         );
 
 
