@@ -13,9 +13,12 @@ still going **measurably faster** than one-at-a-time.
 
 You build this **solo**, across **Weeks 4–5**, and **present it live on Friday of Week 5 (Jul 10)**.
 
-Everything you need is taught by **end of Week 4**: C# + OOP (Wk1–2), collections/generics/exceptions/patterns/
-Serilog (Wk2), SQL — schema, joins, transactions, ACID, isolation, indexes (Wk3), and **EF Core, LINQ, data
-structures, and multithreading served from a Minimal API (Wk4)**. The API is **Minimal API** — controllers
+The **Floor (MVP) is fully taught by end of Week 4** — EF-in-Minimal-API, the no-oversell concurrent core, and
+Serilog. The **Target-tier enablers land early Week 5** — priority queue + benchmark (Mon Jul 6), resilience +
+repository/factory (Tue Jul 7) — **before the Fri Jul 10 presentation**. Prerequisite knowledge: C# + OOP
+(Wk1–2); collections/generics/exceptions/patterns/Serilog (Wk2); SQL — schema, joins, transactions, ACID,
+isolation, indexes (Wk3); and **EF Core, LINQ, data structures, and multithreading served from a Minimal API
+(Wk4)**. The API is **Minimal API** — controllers are **Project 2's** job (Wk6–7), not this build.
 
 ---
 
