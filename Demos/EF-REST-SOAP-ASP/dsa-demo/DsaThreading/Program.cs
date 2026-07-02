@@ -6,14 +6,14 @@ using DsaThreading;
 Console.WriteLine("Hello, World!");
 
 
-ThreadingDemo();
+await ThreadingDemo();
 
 
 
 
 
 
-static void ThreadingDemo()
+static async Task ThreadingDemo()
 {
     // Lets take a look at how C# manages Threads (OS Threads not CPU threads.)
     // In C# Threads are an object - like everything else. Typically they're managed
@@ -208,5 +208,107 @@ static void ThreadingDemo()
         Parallel.For(0, 100000, _ => bank.DepositSafe(1));
         Console.WriteLine($"SAFE balance = {bank.Balance} (expected 1000000)");
     }
+
+    // Interlocked - lock free atomic operations against one variable
+
+    InterlockedDemo();
+
+    static void InterlockedDemo()
+    {
+        long counter = 0;
+        // Interlock - faster than a lock when doing single atomic operations 
+        // if all you need is that - use an interlock over a lock 
+        Parallel.For(0, 100000, _ => Interlocked.Increment(ref counter));
+        Console.WriteLine($"Interlocked = {counter} (expected 100000)");
+
+    }
+
+    // Deadlocks and Starvation
+
+    // Deadlock - If two tasks create locks on resources the other ends up needing 
+    // they can deadlock. In this case they never resolve - our console app
+    // would be waiting forever. 
+
+    // Starvation - A thread gets blocked by another threads work - and stays alive
+    // but cannot progress. Different from a deadlock - because the other thread is able to resolve
+    // This starved thread persists - potentially starving the ThreadPool. 
+
+    // Cancellation Tokens
+
+    CancellationDemo();
+
+    // Rather than abruptly killing a thread or having it die via some exception 
+    // potentially leading to data loss - we can use a cancellation token to ASK a thread to be ended
+    // and it will do so once it has the chance to exit gracefully
+
+    static void CancellationDemo()
+    {
+        // Calling for a CancellationToken, having it auto-cancel after 100ms
+        // Side not using: Once we exit the scope where the variable created with using
+        // lives in - dispose of it. 
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+
+        CancellationToken token = cts.Token; 
+
+        var work = Task.Run(() =>
+        {
+            for (long i = 0; ; i++)
+            {
+                token.ThrowIfCancellationRequested();
+                if (i % 5000000 == 0) { /*some simulated work*/ }
+            }
+        }, token); 
+        
+        try
+        {
+            work.Wait(); // The task is going - we want to have our code wait for it here
+        } // Exception filtering - for when exceptions are thrown by other exceptions. 
+        catch (AggregateException ex) when (ex.InnerException is OperationCanceledException)
+        {
+            Console.WriteLine("Work was cancelled cooperatively");
+        } // When doing Task Parallel Library stuff, we need to unwrap the AggregateExceptions
+        // To allow for specific catch. Same logic as multiple catch blocks
+        // Just more convoluted because AggregateExceptions are like an exception list
+        catch (AggregateException ex) when (ex.InnerException is InvalidOperationException)
+        {
+            Console.WriteLine("How'd you get here?");
+        }
+
+    }
+
+
+    ExceptionDemo();
+
+    static void ExceptionDemo()
+    {   
+        // Our task starts up here when we call run...
+        var t = Task.Run(() => throw new InvalidOperationException("oops - but in a task"));
+
+        // Counter-intuitively, an exception inside a task DOESN'T crash on the spot
+        // We'd imagine that line 279 is where the exception is thrown. Its actually 
+        // thrown during the t.Wait() below.
+        try
+        {
+            t.Wait(); 
+        }
+        catch ( AggregateException ex)
+        {   // Aggregate exceptions themselves are kind of weird
+            // One task can have several faults - so they get thrown inside an AggregateException
+            Console.WriteLine($"Caught: {ex.InnerException!.Message}");
+        }
+
+    }
+
+    // Async / await - related to but not the same as a thread.
+    await AsyncDemo();
+
+    static async Task AsyncDemo()
+    {
+        Console.WriteLine($"Before await on thread #{Environment.CurrentManagedThreadId}");
+        await Task.Delay(50); // non blocking wait - thread is freed
+        Console.WriteLine($"After await on thread #{Environment.CurrentManagedThreadId}");
+
+    }
+    
 
 }
