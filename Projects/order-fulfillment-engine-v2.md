@@ -70,6 +70,13 @@ flowchart TD
 `POST /orders/burst` returns immediately (the burst runs on a background `Task`) so the operator surface stays
 responsive while the fulfillment routine drains the wave.
 
+**Where do the orders come from?** The service **generates its own synthetic order waves** — the operator
+surface is your demo harness (in a real deployment, orders would arrive from customers or a queue; here the
+architecture is production-shaped, the workload is scripted). Your burst endpoint may **self-generate N orders
+server-side** (the trainer demo's shape) or **accept them in the request body** — either is fine, but it must
+be able to produce a **mixed** expedited/normal wave, because the expedited-first acceptance below requires
+both kinds queued together.
+
 ---
 
 ## Your Domain (pick your own — not Library)
@@ -99,7 +106,8 @@ are what you point at on Friday.
 - **Seed and inspect.** *As an operator, I can seed a catalog of products with starting stock and list current
   on-hand quantities at any time.*
   - Accept: `POST /seed` then `GET /inventory` shows each product + starting quantity; re-listing after a burst
-    reflects the drawn-down numbers.
+    reflects the drawn-down numbers. (A migration-time `HasData` seed plus a `POST /seed`-style **reset**
+    endpoint that restores baseline stock satisfies this — the trainer ladder's shape.)
 
 ### Concurrent fulfillment (the core)
 
@@ -147,6 +155,11 @@ are what you point at on Friday.
 
 - A **Minimal-API host** (`dotnet new web`) exposing the operator endpoints above with `MapGet`/`MapPost`,
   route + query + body **model binding**, and correct **status codes** (200 / 201 / 202 / 400 / 404 / 409).
+  Natural homes: **200** reads, **201** a created order, **202** the accepted burst, **400** bad input (an
+  unknown SKU / bad kind), **404** a lookup of an id or SKU that does not exist, **409** a request that
+  conflicts with current state (e.g. resetting stock while a burst is in flight, or violating a unique key).
+  Demonstrate the ones your surface honestly produces and justify each in the README — don't invent an
+  endpoint just to emit a code.
 - The `DbContext` is **registered in DI** (`AddDbContext` / `AddDbContextFactory`) and resolved per request —
   **not** `new`-ed in `Main`. (This is EF in its real home; the same wiring carries straight into Project 2's
   controllers.)
@@ -160,6 +173,9 @@ are what you point at on Friday.
   - `Order` (id, FK Customer, `Priority` enum, `Status` enum, created/completed timestamps)
   - `OrderLine` (id, FK Order, FK Product, quantity)
   - `FulfillmentEvent` (id, FK Order, type, message, timestamp) — audit trail
+
+  Entity and property names are **yours** — translate them into your domain and match the **shape**, not the
+  labels (the trainer's Library ladder, for instance, calls `QuantityOnHand` `CurrentStock`).
 - **Migrations** create the schema; a **seed** populates a catalog **and customers**. Use **Data Annotations**
   for simple constraints, **Fluent API** in `OnModelCreating` for what annotations cannot express (concurrency
   token, 1:1, indexes). At least one **non-key index** (SKU, `Order.Status`) — and you can say why.
@@ -200,6 +216,11 @@ are what you point at on Friday.
 
 ## Techniques You Must Demonstrate (coverage contract)
 
+**How this contract grades against the tiers below:** a **Floor-only submission passes** — it demonstrates
+the Floor subset of this contract (the EF Core, Minimal API, SQL, and core-concurrency lines). The **full
+contract is satisfied only at Target**; that is the intended build, and each Target technique you demonstrate
+strengthens the result. This list is the checklist your README writeup maps to types and endpoints.
+
 **EF Core** — code-first model (≥1 Data Annotation + ≥1 Fluent API mapping) · `DbContext` registered in DI ·
 `DbSet<T>` + change tracking + `SaveChanges` · migrations + seed · a `RowVersion` concurrency token.
 **Minimal API** — `MapGet`/`MapPost` endpoints · model binding (route/query/body) · effective status codes.
@@ -229,7 +250,7 @@ be simple at the Floor.
 - **No overselling** with the **simplest correct** approach: `Task.WhenAll` over the burst, **each task its own
   `DbContext`**, **one transaction per order**, guarded by the **`RowVersion` retry**. Prove it: on-hand
   **never negative**, units-fulfilled **==** units-depleted.
-- The burst runs on a **background `Task`** so the API stays responsive./
+- The burst runs on a **background `Task`** so the API stays responsive.
 - **Serilog** structured logging; README writeup mapping each technique to the type that proves it.
 
 ### Target — the intended build (aim here)
@@ -243,8 +264,9 @@ be simple at the Floor.
 ### Stretch / honors — only after Target is green
 
 - **The original console worker-pool engine**: swap `Task.WhenAll` for a bounded **`BlockingCollection<T>`
-  producer-consumer worker pool** with N persistent workers (see the kept `order-fulfillment-engine-README.md`
-  - `order-fulfillment-engine-minimal-path.md` for that ladder).
+  producer-consumer worker pool** with N persistent workers (the old `order-fulfillment-engine-README.md` /
+  `-minimal-path.md` ladder docs were retired 2026-07-01 — ask the trainer if you want that ladder; git
+  history holds them).
 - **Optimistic-vs-lock A/B**; a true two-lane expedited queue; a SQL **view/proc** via EF `FromSql`; a second
   Serilog sink; an **isolation-level experiment** (raise it, watch throughput fall).
 
@@ -257,6 +279,19 @@ be simple at the Floor.
 ## Submission & Friday (Wk5) Presentation
 
 **In the repo:** the application in its final state + migrations + seed + the README writeup.
+
+**The README writeup — one checklist** (these requirements appear throughout the spec above; they all land
+here so none gets lost):
+
+- [ ] Your **domain**, and whether orders are **single-line or multi-line** (single-line is a fine MVP — say so).
+- [ ] The **technique → type/endpoint map**: each coverage-contract line pointed at the code that proves it.
+- [ ] **Big-O** of your priority queue, your lookups, and your report sort — and why each fits.
+- [ ] The **token-vs-lock contrast**: EF optimistic concurrency vs `lock`/`Interlocked`, and when each fits.
+- [ ] **ACID/isolation reasoning** for the one-transaction-per-order fulfillment.
+- [ ] Why your **non-key index(es)** exist (SKU, `Order.Status`, ...).
+- [ ] Your **benchmark numbers** + the one-line **parallelism-vs-concurrency** note (and, if parallel did not
+      win, why not).
+- [ ] Which **status codes** your surface produces and why (see the Engineering DoD).
 
 **Live demo (Fri Jul 10):**
 
