@@ -5,8 +5,8 @@ exists to get you **moving**, not to build for you. It contains **no C#, no sche
 by design. Three things live here:
 
 1. **Skeleton by CLI** — the exact tool commands that raise an empty, correctly-wired solution.
-2. **Milestone ladder** — what your app can *do* after each stage, mapped to the trainer demo commit
-   that shows the same stage in the Library domain.
+2. **Milestone ladder** — what your app can *do* after each stage, mapped to the trainer's Library
+   demo stage shown in class.
 3. **Acceptance probes** — the runnable checks that tell you a milestone is actually done.
 
 If you can run every probe in Part 3 with the expected result, you have shipped the Floor and know
@@ -74,11 +74,10 @@ page before you write any domain code. An empty app that runs beats a full app t
 
 ## Part 2 — Milestone ladder
 
-The trainer's Library demo is built as a git ladder — one commit per stage, in
-`weeklytechrepo/EFCore-REST-SOAP/demo/library-fulfillment/` (flat end-of-Week-4 snapshot:
-`demo/library-fulfillment-minapi/`). Your build mirrors the **stages**, in **your** domain, with
-**your** names. "Mirror" means: after your version of stage N, your app can do what the checklist
-says — not that your code looks like the demo's.
+The trainer's Library demo was built stage by stage in class; the finished code lives in the trainer
+repo at `Demos/EF-REST-SOAP-ASP/library-api-minimal`. Your build mirrors the **stages**, in **your**
+domain, with **your** names. "Mirror" means: after your version of stage N, your app can do what the
+checklist says — not that your code looks like the demo's.
 
 Do the stages **in order**. Each one is a natural commit in your repo.
 
@@ -86,21 +85,21 @@ Do the stages **in order**. Each one is a natural commit in your repo.
 
 - [ ] Solution builds; empty Minimal API runs; git history started.
 
-### M1 — Data in, data out — mirrors demo `01-efcore-minimal-api`
+### M1 — Data in, data out — mirrors the EF Core + Minimal API demo
 
 - [ ] Your entities exist as a code-first EF model; the first migration created your schema in SQL Server.
 - [ ] `DbContext` registered in DI (never `new`-ed in `Program.cs` top-level code).
 - [ ] One GET endpoint returns real rows from the database.
 - **Probe P1 partially passes** (inventory listing; seeding may still be manual).
 
-### M2 — Seed, reset, report — mirrors demo `02-persistence-reports`
+### M2 — Seed, reset, report — mirrors the seeding + reports demo
 
 - [ ] Migration-time seed (catalog **and** customers) plus a reset endpoint that restores baseline stock.
 - [ ] At least one LINQ report endpoint (grouping/aggregation, not a raw table dump).
 - [ ] Fluent API and Data Annotations both in use; at least one non-key index you can justify.
 - **Probes P1 and P7 pass.**
 
-### M3 — The concurrent core — mirrors demo `03-concurrent-fulfillment`
+### M3 — The concurrent core — mirrors the concurrent fulfillment demo
 
 The hard one; everything else is decoration around it.
 
@@ -113,19 +112,19 @@ The hard one; everything else is decoration around it.
 - [ ] Serilog structured stream shows fulfilled/backordered per order.
 - **Probes P2 and P3 pass. This is the Floor — a submission frozen here passes.**
 
-### M4 — Priority + benchmark (Target) — mirrors demo `04-priority-benchmark`
+### M4 — Priority + benchmark (Target) — mirrors the priority + benchmark demo
 
 - [ ] Expedited-first via `PriorityQueue<T>` (or a justified two-lane equivalent).
 - [ ] Sequential-vs-parallel benchmark with stock reset between runs, both timings + speedup printed.
 - **Probes P4 and P5 pass.**
 
-### M5 — Resilience + observability (Target) — mirrors demo `05-resilience-observability`
+### M5 — Resilience + observability (Target) — mirrors the resilience + observability demo
 
 - [ ] Graceful stop: cancellation honored, no half-applied order, logs flushed on exit.
 - [ ] Severity tiers in the log; a custom exception that carries data, caught specific-before-base.
 - **Probe P6 passes. Full Target.**
 
-Demo stages `06`–`08` (controllers, SOAP, middleware) are **Project 2 material — not this build**.
+Controllers, SOAP, and middleware are **Project 2 material — not this build**.
 
 ---
 
