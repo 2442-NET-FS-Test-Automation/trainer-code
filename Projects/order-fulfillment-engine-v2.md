@@ -31,7 +31,7 @@ isolation, indexes (Wk3); and **EF Core, LINQ, data structures, and multithreadi
 | **Mode** | **Solo** — one learner, one repo, one domain |
 | **Stack** | .NET **Minimal API** · EF Core (code-first) · SQL Server in Docker · Serilog |
 | **Submission** | Your `FirstName-LastName` repo: runnable app + migrations + seed + README writeup |
-| **Scaffold** | **None.** No starter, no solution key. Designing the schema, the endpoints, and the concurrency strategy **is** the project. |
+| **Scaffold** | **No code scaffold.** No starter, no solution key — designing the schema, the endpoints, and the concurrency strategy **is** the project. A code-free runway (CLI skeleton commands, milestone ladder, acceptance probes) lives in `order-fulfillment-runway.md`. |
 
 ---
 
