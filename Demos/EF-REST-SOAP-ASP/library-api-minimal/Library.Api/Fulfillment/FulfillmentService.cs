@@ -48,7 +48,7 @@ public class FulfillmentService : IFulfillmentService
 
         // Lets create that dictionary with the productId Key and the OrderId value
         // yay for LINQ/Collections namespace
-        var requested = order.Lines.ToDictionary(l => l.ProductId, l => l.OrderId);
+        var requested = order.Lines.ToDictionary(l => l.ProductId, l => l.Quantity);
 
         // creating a flag for "can i continue fulfilling this order"
         bool canFulfill = true; 
