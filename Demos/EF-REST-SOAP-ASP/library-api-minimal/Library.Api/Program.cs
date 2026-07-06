@@ -43,6 +43,7 @@ builder.Services.AddDbContextFactory<LibraryDbContext>(options => options.UseSql
 
 // Registered our custom service with the builder
 builder.Services.AddScoped<IFulfillmentService, FulfillmentService>();
+builder.Services.AddScoped<ISeeder, Seeder>();
 
 // Swagger stuff added to builder
 builder.Services.AddEndpointsApiExplorer();
@@ -237,6 +238,51 @@ app.MapPost("/orders", async ( OrderPaylod orderRequest,  IDbContextFactory<Libr
     // Now that we've added the order - we try to fulfill it
     FulfillmentResult result = await fSvc.FulfillOneAsync(newOrder.Id, ct); // newOrder is now in the db, we can ask for its pk
     return Results.Ok(new {orderId = newOrder.Id, result = result.ToString()});
+});
+
+
+
+// Burst endpoint
+// Forgoing creating a record - we will take these from a the query string
+// IHostAPplicationLifetime - this lets us see events related to the app lifetime
+// We are going to use it to make sure we "flush" pending orders if the app is asked to stop
+app.MapPost("/orders/burst", (int n, bool expedited,ISeeder seeder, 
+    IServiceScopeFactory scopes, IHostApplicationLifetime lifetime) =>
+{
+    var ids = seeder.SeedOrders(n, expedited); // calling the seed orders method with the stuff from front end
+    var appStopping = lifetime.ApplicationStopping; // gives us a cancellation token that is called when app goes to shutdown
+
+    _ = Task.Run( async () => // assigning the task result to a discard runs this as a background task
+    {
+        try
+        {
+            using var scope = scopes.CreateScope(); // ask for a fresh scope
+            var service  = scope.ServiceProvider.GetRequiredService<IFulfillmentService>(); //grab a fulfillment service
+            await service.FulfillBurstAsync(ids, appStopping); // use it to call fulfillBurstAsync()
+        } 
+        catch (Exception ex)
+        {   
+            // This task is fire and forget because we aren't waiting or storing its result
+            // any exceptions would be "swallowed" i.e. they would die with the task in the background 
+            Log.Error(ex, "Burst fulfillment failed");
+        }
+    }, appStopping);
+
+});
+
+app.MapGet("/verify/no-oversell", (LibraryDbContext db) =>
+{
+    var rows = db.Inventory.Include(i => i.Product).ToList(); // grab Inventory rows, include the product objects as well
+    var negative = rows.Where(i => i.CurrentStock < 0).ToList(); //grab items with negative stock
+    var fulfilled = db.FulfillmentEvents.Count(e => e.Type == "Fulfilled"); // count the fulfilled orders
+
+    return new
+    {
+        anyNegative = negative.Any(),
+        onHand = rows.Select(i => new {i.ProductId, i.CurrentStock}),
+        unitsFulfilled = fulfilled 
+    };
+
 });
 
 
