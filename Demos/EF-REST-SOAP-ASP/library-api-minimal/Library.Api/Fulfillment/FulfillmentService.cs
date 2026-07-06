@@ -111,8 +111,8 @@ public class FulfillmentService : IFulfillmentService
     {
         
         // This is that RowVersion Change Tracker entry retry from yesterday
-        // Lets set max retries to 3 - by wrapping everything in a loop
-        for (int attempt = 0; ; attempt++)
+        // NEW: Loop forever until we run out of stock
+        while (true)
         {
             
             // Our loop as written never exits - it does increment attempt for us.
@@ -127,7 +127,7 @@ public class FulfillmentService : IFulfillmentService
             // We can tell our try catch how many times to handle this exception for us
             // After 3 attempts - we won't enter the catch. It bubbles up to wherever this method 
             // was called
-            catch (DbUpdateConcurrencyException ex) when (attempt < 3)
+            catch (DbUpdateConcurrencyException ex) 
             {
                 
                 // Retry logic - remember that Change Tracker stuff?
@@ -152,7 +152,7 @@ public class FulfillmentService : IFulfillmentService
                         int desiredAmount = requestedByProductId[inv.ProductId];
 
                         // Re-check on the fresh stock - don't blindly trust it
-                        if (freshValue < desiredAmount) return false;
+                        if (freshValue < desiredAmount) return false; // this is now our exit condition
                         inv.CurrentStock = freshValue - desiredAmount;
                     }
                 }
