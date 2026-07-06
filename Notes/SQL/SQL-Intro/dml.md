@@ -49,10 +49,15 @@ WHERE JoinedDate < '2020-01-01';
 
 Foreign keys mean you must insert in **dependency order**. A `Book` references an `Author`, and a `Loan` references both a `Book` and a `Member`, so:
 
-```
-Author, Member   (parents — no FKs out)
-   └─ Book        (needs an Author to exist)
-        └─ Loan   (needs a Book AND a Member to exist)
+```mermaid
+flowchart TD
+    Author["Author (parent — no FKs out)"]
+    Member["Member (parent — no FKs out)"]
+    Book["Book (needs an Author to exist)"]
+    Loan["Loan (needs a Book AND a Member to exist)"]
+    Author --> Book
+    Book --> Loan
+    Member --> Loan
 ```
 
 Insert a `Book` with `AuthorId = 5` before author 5 exists and the FK rejects it. Seed parents first.

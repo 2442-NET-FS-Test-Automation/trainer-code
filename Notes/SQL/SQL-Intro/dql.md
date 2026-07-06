@@ -34,8 +34,9 @@ ORDER  BY PublishedYear DESC;      -- the output order
 
 SQL is written in one order but **evaluated** in another. The engine processes:
 
-```
-FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
+```mermaid
+flowchart LR
+    FROM --> WHERE --> GB["GROUP BY"] --> HAVING --> SELECT --> OB["ORDER BY"]
 ```
 
 The two consequences that bite everyone:
@@ -113,7 +114,7 @@ HAVING   COUNT(*) > 1;        -- HAVING filters the GROUPS (after aggregation)
 - `GROUP BY AuthorId` → one output row per author.
 - `HAVING` filters **groups** (using an aggregate), where `WHERE` filters **rows** (before grouping).
 
-> **We are only previewing the shape here.** Aggregate functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`), the `WHERE`-vs-`HAVING` distinction in depth, and real grouped reports are **Thursday's** topic (`functions.md`). Today: recognize the keywords and where they sit in the clause order. Don't go deep yet.
+> **We are only previewing the shape here.** Aggregate functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`), the `WHERE`-vs-`HAVING` distinction in depth, and real grouped reports are **Thursday's** topic (`../SQL-Intermediate/functions.md`). Today: recognize the keywords and where they sit in the clause order. Don't go deep yet.
 
 ## Code Example
 

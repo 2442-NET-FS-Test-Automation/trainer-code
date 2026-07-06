@@ -6,6 +6,7 @@
 - Explain **equi-joins** vs **theta-joins** and what the `ON` clause does.
 - Choose between a **subquery** and a **join**.
 - Combine result sets with **set operations** (`UNION`) at an awareness level.
+- Recognize **CTEs** (`WITH name AS (...)`) as named subqueries at an awareness level.
 
 > **Where to run this:** execute these statements against a SQL Server database using **SSMS** or **Azure Data Studio**. New to the setup? The Day-1 `00-setup-docker` walkthrough stands up SQL Server in a container — then run everything against your `sql-training` database.
 
@@ -130,13 +131,12 @@ The join *type* (inner/left/...) decides which unmatched rows survive; the `ON` 
 
 ### Visualizing the four main joins
 
-```
-INNER         LEFT          RIGHT         FULL OUTER
- (A∩B)        (A + A∩B)     (B + A∩B)     (A ∪ B)
-  ▓▓            ▓▓▓▓          ░▓▓▓          ▓▓▓▓▓▓
- only          all A,        all B,        everything,
- matches       matched B     matched A     nulls where unmatched
-```
+| Join | Set | What survives |
+|---|---|---|
+| **INNER** | A ∩ B | only matching rows |
+| **LEFT** | A + (A ∩ B) | all A, matched B (nulls where unmatched) |
+| **RIGHT** | B + (A ∩ B) | all B, matched A (nulls where unmatched) |
+| **FULL OUTER** | A ∪ B | everything, nulls where unmatched |
 
 ### Subquery vs join
 
@@ -175,6 +175,31 @@ SELECT Name FROM dbo.Member;
 ```
 
 `UNION` removes duplicate rows; `UNION ALL` keeps them (and is faster). `INTERSECT` (rows in both) and `EXCEPT` (rows in the first not the second) round out the family. These are **awareness-level** this week — recognize them; you won't be tested deeply.
+
+### CTEs (awareness level)
+
+A **Common Table Expression (CTE)** is a **named, temporary result set** defined with `WITH name AS (...)` that exists only for the **single statement** right after it — essentially a named subquery that reads top-down instead of nested:
+
+```sql
+-- a named step instead of a nested subquery
+WITH RecentBooks AS (
+    SELECT BookId, Title, PublishedYear FROM dbo.Book WHERE PublishedYear >= 2000
+)
+SELECT Title, PublishedYear FROM RecentBooks ORDER BY PublishedYear DESC;
+```
+
+A CTE makes a complex query readable by naming an intermediate step. Unlike a **view**, it is **not stored** and can't be reused across statements — it lives for one query. CTEs pair naturally with window functions for "top row per group" (a filter a `WHERE` can't do directly on a window function):
+
+```sql
+WITH Ranked AS (
+    SELECT Title, CategoryId,
+           ROW_NUMBER() OVER (PARTITION BY CategoryId ORDER BY TotalCopies DESC) AS rn
+    FROM   dbo.Book
+)
+SELECT Title, CategoryId FROM Ranked WHERE rn = 1;   -- one top book per category
+```
+
+`ROW_NUMBER() OVER (...)` here is a **window function** (see `functions.md`). CTEs are **awareness-level** this week — recognize the `WITH ... AS` shape; you won't be tested deeply.
 
 ## Code Example
 
@@ -224,6 +249,7 @@ The normalized model, reassembled into the human-readable report it was always m
 - The **join type** decides which unmatched rows survive; the **`ON` condition** (equi = `=`, theta = `<`/`>`) decides what matches.
 - **Subqueries** test membership/aggregate comparisons; **joins** combine columns from multiple tables — often interchangeable, joins usually clearer.
 - **`UNION`** stacks result sets (dedupes; `UNION ALL` keeps duplicates) — awareness level.
+- **CTEs** (`WITH name AS (...)`) name a temporary result set for the next statement — a readable subquery, not stored like a view; awareness level.
 - Watch the **`LEFT JOIN` + `WHERE`** trap: filter the right table in `ON`, not `WHERE`, to keep outer rows.
 
 ## Additional Resources

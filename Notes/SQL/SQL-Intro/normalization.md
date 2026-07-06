@@ -24,11 +24,11 @@ Suppose we kept everything about a book — including its category and *all* its
 
 | BookId | Title | CategoryName | CategoryDesc | Author1 | Author2 |
 |---|---|---|---|---|---|
-| 1 | Clean Code | Software | Programming craft | R. Martin | |
-| 2 | Refactoring | Software | Programming craft | M. Fowler | K. Beck |
-| 3 | Patterns | Software | Programming craft | Gamma | Helm |
+| 1 | Clean Code | Software | Software design and craftsmanship | R. Martin | |
+| 2 | Refactoring | Software | Software design and craftsmanship | M. Fowler | K. Beck |
+| 3 | Patterns | Software | Software design and craftsmanship | Gamma | Helm |
 
-"Programming craft" is copied on every Software row. That redundancy causes three **anomalies**:
+"Software design and craftsmanship" is copied on every Software row. That redundancy causes three **anomalies**:
 
 - **Update anomaly** — fix the category description and you must update *every* book in that category; miss one and the data now contradicts itself.
 - **Insertion anomaly** — you can't record a new category until at least one book uses it (where would the row go?).
@@ -44,9 +44,9 @@ The flat table violates 1NF: `Author1`/`Author2` is a repeating group (and what 
 
 | BookId | Title | CategoryName | CategoryDesc | Author |
 |---|---|---|---|---|
-| 1 | Clean Code | Software | Programming craft | R. Martin |
-| 2 | Refactoring | Software | Programming craft | M. Fowler |
-| 2 | Refactoring | Software | Programming craft | K. Beck |
+| 1 | Clean Code | Software | Software design and craftsmanship | R. Martin |
+| 2 | Refactoring | Software | Software design and craftsmanship | M. Fowler |
+| 2 | Refactoring | Software | Software design and craftsmanship | K. Beck |
 
 Now every cell is atomic and there's no `Author1/Author2`. **Justification:** atomic columns are queryable (you can filter/join on `Author`) and you're no longer capped at a fixed number of authors.
 
@@ -60,8 +60,8 @@ Our 1NF table's natural key is the composite **(BookId, Author)**. But `Title`, 
 
 | BookId | Title | CategoryName | CategoryDesc |
 |---|---|---|---|
-| 1 | Clean Code | Software | Programming craft |
-| 2 | Refactoring | Software | Programming craft |
+| 1 | Clean Code | Software | Software design and craftsmanship |
+| 2 | Refactoring | Software | Software design and craftsmanship |
 
 `BookAuthor` (keyed by `BookId + AuthorId`):
 
@@ -83,7 +83,7 @@ In `Book`, `CategoryDesc` doesn't depend on `BookId` — it depends on `Category
 
 | CategoryId | CategoryName | CategoryDesc |
 |---|---|---|
-| 1 | Software | Programming craft |
+| 1 | Software | Software design and craftsmanship |
 
 `Book` (now references the category):
 
@@ -92,7 +92,7 @@ In `Book`, `CategoryDesc` doesn't depend on `BookId` — it depends on `Category
 | 1 | Clean Code | 1 |
 | 2 | Refactoring | 1 |
 
-**Justification:** "Programming craft" is now stored **once**. Change it in one place; no book can disagree about what "Software" means. All three anomalies are gone.
+**Justification:** "Software design and craftsmanship" is now stored **once**. Change it in one place; no book can disagree about what "Software" means. All three anomalies are gone.
 
 ### The normal forms in one line each
 
@@ -153,7 +153,7 @@ ALTER TABLE dbo.Book ADD CategoryId INT NULL
 -- CREATE TABLE dbo.BookAuthor ( ... composite PK (BookId, AuthorId) ... );
 ```
 
-Before: "Programming craft" on every Software book, one author per book. After: the category text exists once, and a book can have any number of authors.
+Before: "Software design and craftsmanship" on every Software book, one author per book. After: the category text exists once, and a book can have any number of authors.
 
 ## Common Mistakes / Interview Traps
 

@@ -49,12 +49,17 @@ When an interviewer asks "why a relational database?", these are the reasons —
 
 ### The vocabulary (get these exact)
 
-```
-DATABASE  ── a named container of related tables (e.g. LibraryDB)
-  └─ TABLE      ── one entity type, a grid of rows and columns (e.g. Book)
-       ├─ COLUMN  ── one attribute, with a fixed data type (e.g. Title VARCHAR(200))
-       ├─ ROW     ── one record / one instance of the entity (one specific book)
-       └─ FIELD   ── the single cell where a row meets a column
+```mermaid
+flowchart TD
+    DB["DATABASE — a named container of related tables (e.g. LibraryDB)"]
+    TABLE["TABLE — one entity type, a grid of rows and columns (e.g. Book)"]
+    COLUMN["COLUMN — one attribute, with a fixed data type (e.g. Title VARCHAR(200))"]
+    ROW["ROW — one record / one instance of the entity (one specific book)"]
+    FIELD["FIELD — the single cell where a row meets a column"]
+    DB --> TABLE
+    TABLE --> COLUMN
+    TABLE --> ROW
+    TABLE --> FIELD
 ```
 
 - A **schema** has two meanings you will hear both of: (1) the *structure* of your database — the tables, columns, types, and relationships, the "blueprint"; and (2) in SQL Server, a **namespace** that groups objects, written as a prefix like `dbo.Book` (`dbo` = "database owner", the default schema). Context tells you which.
@@ -69,8 +74,8 @@ SQL is one language, but its keywords group into five **sublanguages** by *what 
 | **DDL** | Data **Definition** Language | Define/shape the structure | `CREATE`, `ALTER`, `DROP`, `TRUNCATE` | Mon (`ddl.md`) |
 | **DML** | Data **Manipulation** Language | Change the data in tables | `INSERT`, `UPDATE`, `DELETE` | Tue (`dml.md`) |
 | **DQL** | Data **Query** Language | Read/query the data | `SELECT` | Tue (`dql.md`) |
-| **TCL** | **Transaction** Control Language | Group changes into all-or-nothing units | `BEGIN`, `COMMIT`, `ROLLBACK` | Fri (`transactions.md`) |
-| **DCL** | Data **Control** Language | Manage permissions/access | `GRANT`, `REVOKE` | Fri (`procedures-triggers-dcl.md`) |
+| **TCL** | **Transaction** Control Language | Group changes into all-or-nothing units | `BEGIN`, `COMMIT`, `ROLLBACK` | Fri (`../SQL-Intermediate/transactions.md`) |
+| **DCL** | Data **Control** Language | Manage permissions/access | `GRANT`, `REVOKE` | Fri (`../SQL-Intermediate/procedures-triggers-dcl.md`) |
 
 > Some texts fold DQL's `SELECT` into DML and call it four sublanguages. Both framings are "correct" — if asked, name all five but mention that `SELECT` is sometimes grouped under DML. Knowing the nuance signals you actually understand it.
 

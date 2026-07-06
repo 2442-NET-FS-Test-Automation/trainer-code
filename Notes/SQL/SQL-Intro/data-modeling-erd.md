@@ -29,23 +29,40 @@ A **data model** describes the *things* a system tracks and *how they connect*. 
 
 An **ERD** is the picture of that model. Each box is an entity; the lines between boxes are relationships. Keys are marked: **PK** (primary key — the row's identity) and **FK** (foreign key — a pointer to another table's PK). Here is the first-pass Library model we build live this week:
 
-```
-AUTHOR                         BOOK                              MEMBER
-------                         ----                              ------
-AuthorId   PK                  BookId    PK                      MemberId  PK
-FirstName                      Title                             FirstName
-LastName                       ISBN      (unique)                LastName
-BirthYear                      PublishedYear                     Email     (unique)
-                               AuthorId  FK -> Author            JoinedDate
+```mermaid
+erDiagram
+    AUTHOR ||--o{ BOOK : writes
+    BOOK   ||--o{ LOAN : "loaned in"
+    MEMBER ||--o{ LOAN : borrows
 
-                       LOAN
-                       ----
-                       LoanId    PK
-                       BookId    FK -> Book
-                       MemberId  FK -> Member
-                       LoanDate
-                       DueDate
-                       ReturnDate   (null = still out)
+    AUTHOR {
+        int      AuthorId PK
+        varchar  FirstName
+        varchar  LastName
+        int      BirthYear
+    }
+    BOOK {
+        int      BookId PK
+        varchar  Title
+        char     ISBN UK
+        int      PublishedYear
+        int      AuthorId FK
+    }
+    MEMBER {
+        int      MemberId PK
+        varchar  FirstName
+        varchar  LastName
+        varchar  Email UK
+        date     JoinedDate
+    }
+    LOAN {
+        int      LoanId PK
+        int      BookId FK
+        int      MemberId FK
+        date     LoanDate
+        date     DueDate
+        date     ReturnDate "null = still out"
+    }
 ```
 
 To **read** it: "An `Author` has an `AuthorId` that identifies it. A `Book` carries an `AuthorId` foreign key, so each book points at one author. A `Loan` carries *two* foreign keys — `BookId` and `MemberId` — so a loan ties one book to one member." You just read the whole system's structure off four boxes.

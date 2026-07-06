@@ -7,6 +7,7 @@
 - Group rows with `GROUP BY` and filter groups with `HAVING`.
 - State precisely the difference between `WHERE` and `HAVING`.
 - Improve readability with column **aliases**.
+- *(Awareness)* Recognize **window functions** (`OVER (PARTITION BY ... ORDER BY ...)`) as aggregates that keep every row.
 
 > **Where to run this:** execute these statements against a SQL Server database using **SSMS** or **Azure Data Studio**. New to the setup? The Day-1 `00-setup-docker` walkthrough stands up SQL Server in a container — then run everything against your `sql-training` database.
 
@@ -112,6 +113,22 @@ GROUP BY AuthorId;
 
 Without `AS BookCount`, an aggregate column has no name in the result — alias it. Use `[ ]` (or `" "`) when the alias has spaces. A **table alias** (`FROM dbo.Book AS b`) shortens long names and is essential in joins (tomorrow's neighbor topic).
 
+### Window functions (awareness level)
+
+A **window function** computes a value across a set of related rows — the *window* — **without collapsing them** the way `GROUP BY` does. A `GROUP BY` query returns one row per group; a window function keeps **every** row and attaches the computed value alongside it. You define the window with `OVER (PARTITION BY ... ORDER BY ...)`: `PARTITION BY` splits rows into groups (like `GROUP BY`, but non-collapsing), and `ORDER BY` orders rows *within* each partition.
+
+```sql
+-- rank books by copies WITHIN each category, keeping every book row
+SELECT Title,
+       CategoryId,
+       TotalCopies,
+       ROW_NUMBER() OVER (PARTITION BY CategoryId ORDER BY TotalCopies DESC) AS RankInCategory
+FROM   dbo.Book;
+-- GROUP BY CategoryId would return ONE row per category; the window keeps every book and labels it.
+```
+
+The common ranking functions: `ROW_NUMBER()` numbers rows 1,2,3,4; `RANK()` leaves **gaps** after ties (1,2,2,4); `DENSE_RANK()` does not (1,2,2,3). Aggregates work as windows too — `COUNT(*) OVER (PARTITION BY CategoryId)` keeps a per-group total on every row. These are **awareness-level** this week — recognize the shape; you won't be tested deeply. (Deeper treatment lives in the QC-2 review guide's study guide and Drill 19.)
+
 ## Code Example
 
 A real grouped report on the Library data — loans per member, busiest first, members with more than one loan:
@@ -141,6 +158,7 @@ One statement answers "who are our most active borrowers, and when did they last
 - **Forgetting NULLs in `AVG`/`SUM`.** They're ignored — `AVG` divides by non-null count, which may not be what you expect.
 - **Mixing up aggregate and scalar.** "Is `COUNT` scalar?" — no, it's aggregate (many rows → one value). `UPPER`/`LEN`/`GETDATE` are scalar (per-row).
 - **Filtering rows in `HAVING` that don't need an aggregate.** Works, but it's slower and less clear — use `WHERE`.
+- **Putting a window function in `WHERE`.** It's computed *after* `WHERE`, so you can't filter on it directly — wrap it in a CTE/subquery, then filter the outer query (the top-N-per-group pattern).
 
 ## Decision Guide: `WHERE` or `HAVING`?
 
@@ -157,6 +175,7 @@ One statement answers "who are our most active borrowers, and when did they last
 - **`HAVING`** filters groups (can use aggregates); **`WHERE`** filters rows (cannot) and runs first.
 - Watch **NULL** behavior: `COUNT(*)` vs `COUNT(col)`, and `AVG`/`SUM` ignoring nulls.
 - **Aliases** (`AS`) name aggregate columns and shorten table names for readable output.
+- **Window functions** (`OVER (PARTITION BY ... ORDER BY ...)`) compute across a row-set but **keep every row** — unlike `GROUP BY`, which collapses; awareness level.
 
 ## Additional Resources
 
