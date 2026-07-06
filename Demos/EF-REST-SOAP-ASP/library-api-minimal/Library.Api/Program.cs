@@ -3,6 +3,7 @@ using Library.Data;
 using Library.Data.Entities;
 using Serilog;
 using Library.Api.Fulfillment;
+using System.Diagnostics;
 
 // This is my API program.cs
 // No main. We can think of it as 2 sections
@@ -44,6 +45,7 @@ builder.Services.AddDbContextFactory<LibraryDbContext>(options => options.UseSql
 // Registered our custom service with the builder
 builder.Services.AddScoped<IFulfillmentService, FulfillmentService>();
 builder.Services.AddScoped<ISeeder, Seeder>();
+builder.Services.AddScoped<BurstPlanner>(); // adding our BurstPlanner, will be used in FulfillmentService
 
 // Swagger stuff added to builder
 builder.Services.AddEndpointsApiExplorer();
@@ -283,6 +285,63 @@ app.MapGet("/verify/no-oversell", (LibraryDbContext db) =>
         unitsFulfilled = fulfilled 
     };
 
+});
+
+
+app.MapPost("/benchmark", async (int n, IFulfillmentService fs, ISeeder seeder, CancellationToken ct) =>
+{
+    // Lets see how sequential vs concurrent/arallel runs compare - with mixed orders
+    var ids1 = seeder.ResetAndCreateOrders(n);
+
+    // First, sequential
+    var sw1 = Stopwatch.StartNew(); // start our stopwatch
+
+    foreach ( var id in ids1)
+        await fs.FulfillOneAsync(id, ct);
+
+    sw1.Stop();
+
+    // Next concurrent
+    var ids2 = seeder.ResetAndCreateOrders(n);
+
+    var sw2 = Stopwatch.StartNew(); // start second stopwatch
+    await fs.FulfillBurstAsync(ids2, ct);
+    sw2.Stop();
+
+    return new
+    {
+        sequentialMs = sw1.ElapsedMilliseconds,
+        concurrentMs = sw2.ElapsedMilliseconds
+    };
+
+});
+
+
+// Completion report -- what orders got completed and when
+// Note: In general Expedited orders should be completed first. In practice - it depends on how long each thread takes
+// if for some reason an expedited order's thread slows down (due to some background process on the computer or something)
+// then a normal order CAN beat it. But we should see a defined trend.
+app.MapGet("/reports/by-completion", (LibraryDbContext db) =>
+{
+   return db.Orders // look inside orders table
+        .Where(o => o.Status == Status.Fulfilled) // grab fulfilled orders
+        .OrderBy(o => o.CompletedUtc) // order by when they were completed
+        .Select(o => new { o.Id, o.Priority, o.CompletedUtc}) // use info from those orders to make some return objects
+        .ToList(); // put them in a list and return them as JSON body of response
+
+});
+
+app.MapGet("/reports/top-products", (LibraryDbContext db) =>
+{
+    var ranked = db.FulfillmentEvents
+        .Where(e => e.Type == "Fulfilled")
+        .Join(db.OrderLines, e => e.OrderId, l => l.OrderId, (e, l) => l)
+        .GroupBy(l => l.ProductId)
+        .Select(g => new { ProductId = g.Key, Units = g.Sum(l => l.Quantity) })
+        .OrderByDescending(x => x.Units)
+        .ToList(); // LINQ is basically magic - pls learn to use it
+
+    return ranked;
 });
 
 

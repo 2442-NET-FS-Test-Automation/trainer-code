@@ -28,11 +28,13 @@ public class FulfillmentService : IFulfillmentService
     // If we need a DbContext or DbContextFactory or Logger or any other dependency 
     // we DO NOT instantiate one here, we ask for one via the Constructor
     private readonly IDbContextFactory<LibraryDbContext> _factory; // holds my factory
+    private readonly BurstPlanner _planner; //holds my BurstPlanner object
 
     // The factory in the constructor arguments list comes from the ASP.NET DI Container
-    public FulfillmentService(IDbContextFactory<LibraryDbContext> factory)
+    public FulfillmentService(IDbContextFactory<LibraryDbContext> factory, BurstPlanner planner)
     {
         _factory = factory;
+        _planner = planner;
     }
 
     // This method is going to handle fulfillment - its gonna be a bit long. Which is why we didn't 
@@ -161,9 +163,24 @@ public class FulfillmentService : IFulfillmentService
     }
 
     public async Task<BurstResult> FulfillBurstAsync(IEnumerable<int> orderIds, CancellationToken ct)
-    {
+    {   
+        // Grabbing all my orderIds
+        List<int> idList = orderIds.ToList();
+
+        List<Order> orders; // place to store my orders
+        
+        // Calling on a dbcontext that we discard after we're done
+        await using (var db = await _factory.CreateDbContextAsync(ct))
+        {   // Look in our db, grab every order that appears in our idList
+            orders = await db.Orders.Where(o => idList.Contains(o.Id)).ToListAsync();
+        }
+
+        // Calling on our planning logic inside BurstPlanner
+        // planned contains our expedited/priority first order
+        var planned = _planner.OrderByPriority(orders);
+        
         // we are just going to piggyback off of FulfilOneAsync - no need to rewrite logic we can just call it again
-        var tasks = orderIds.Select(id => FulfillOneAsync(id, ct)); // each call will get its own dbContext
+        var tasks = planned.Select(id => FulfillOneAsync(id, ct)); // each call will get its own dbContext
 
         // Await here until all tasks in the collection are complete
         var results = await Task.WhenAll(tasks);
