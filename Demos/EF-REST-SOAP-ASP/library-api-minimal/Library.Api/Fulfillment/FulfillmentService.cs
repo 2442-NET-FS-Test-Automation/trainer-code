@@ -3,6 +3,7 @@ using Library.Data;
 using Library.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Collections.Concurrent;
 
 namespace Library.Api.Fulfillment;
 
@@ -12,6 +13,7 @@ public interface IFulfillmentService
 {
     public Task<FulfillmentResult> FulfillOneAsync(int orderId, CancellationToken ct);
     public Task<BurstResult> FulfillBurstAsync(IEnumerable<int> orderIds, CancellationToken ct);
+    public int ResolveProductId(string sku);
 }
 
 // Im going to stick everything about order fulfillment in this file
@@ -29,13 +31,29 @@ public class FulfillmentService : IFulfillmentService
     // we DO NOT instantiate one here, we ask for one via the Constructor
     private readonly IDbContextFactory<LibraryDbContext> _factory; // holds my factory
     private readonly BurstPlanner _planner; //holds my BurstPlanner object
+    private readonly ConcurrentDictionary<string, int> _skuToProductId;
 
     // The factory in the constructor arguments list comes from the ASP.NET DI Container
     public FulfillmentService(IDbContextFactory<LibraryDbContext> factory, BurstPlanner planner)
     {
         _factory = factory;
         _planner = planner;
+
+        // Storing skus and their product Id's so we can do O(1) lookup if we need it later
+        using var db = _factory.CreateDbContext();
+        _skuToProductId = new ConcurrentDictionary<string, int>(
+            db.Products.ToDictionary(p => p.Sku, p => p.Id)
+        );
+
     }
+
+    // Method to resolve Skus to productIds using that dictionary
+    public int ResolveProductId(string sku)
+    {
+        try { return _skuToProductId[sku]; }
+        catch (KeyNotFoundException) { throw new UnknownSkuException(sku); }
+    }
+
 
     // This method is going to handle fulfillment - its gonna be a bit long. Which is why we didn't 
     // just write all of this in Program.cs
@@ -130,7 +148,8 @@ public class FulfillmentService : IFulfillmentService
             // After 3 attempts - we won't enter the catch. It bubbles up to wherever this method 
             // was called
             catch (DbUpdateConcurrencyException ex) 
-            {
+            {   
+                Log.Warning("Attempty retry");
                 
                 // Retry logic - remember that Change Tracker stuff?
                 // entry is an EF Core Change tracker entry
