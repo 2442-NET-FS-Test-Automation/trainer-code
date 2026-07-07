@@ -11,7 +11,7 @@ The headline engineering problem is **correctness under concurrency**: many orde
 once, and the service must **never oversell** (never fulfill an order that takes inventory below zero) while
 still going **measurably faster** than one-at-a-time.
 
-You build this **solo**, across **Weeks 4–5**, and **present it live on Friday of Week 5 (Jul 10)**.
+You build this **solo**, across **Weeks 4–5**, and **present it live on Friday of Week 5 (Jul 10, PM)**.
 
 The **Floor (MVP) is fully taught by end of Week 4** — EF-in-Minimal-API, the no-oversell concurrent core, and
 Serilog. The **Target-tier enablers land early Week 5** — priority queue + benchmark (Mon Jul 6), resilience +
@@ -27,7 +27,7 @@ isolation, indexes (Wk3); and **EF Core, LINQ, data structures, and multithreadi
 | | |
 |---|---|
 | **Handed out** | Mon Jun 29 (after the EF-in-Minimal-API intro) |
-| **Presented** | **Fri Jul 10** — live demo to the room/stakeholders |
+| **Presented** | **Fri Jul 10, PM** — live demo to the room/stakeholders |
 | **Mode** | **Solo** — one learner, one repo, one domain |
 | **Stack** | .NET **Minimal API** · EF Core (code-first) · SQL Server in Docker · Serilog |
 | **Submission** | Your `FirstName-LastName` repo: runnable app + migrations + seed + README writeup |
