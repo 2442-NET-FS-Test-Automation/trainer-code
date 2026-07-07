@@ -401,6 +401,9 @@ app.MapPost("/orders-with-factory", async (OrderRequest req, OrderFactory factor
     }
 });
 
+app.Lifetime.ApplicationStopping.Register(() =>
+    Log.Information("Shutdown requested — draining in-flight fulfillments"));
+
 // My file always ends with app.Run() - minimal API or Controller API
 app.Run();
 Log.CloseAndFlush();

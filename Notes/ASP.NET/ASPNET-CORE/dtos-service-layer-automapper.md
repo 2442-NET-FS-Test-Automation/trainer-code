@@ -24,10 +24,10 @@ public record InventoryDto(string Sku, string Name, int CurrentStock);
 
 // IN: what creators send - only what a client MAY set, with validation attached
 public record InventoryCreateDto(
-    [property: Required, MaxLength(20)]  string Sku,
-    [property: Required, MaxLength(200)] string Name,
-    [property: Range(0.01, 100000)]      decimal Price,
-    [property: Range(0, int.MaxValue)]   int CurrentStock);
+    [Required, MaxLength(20)]  string Sku,
+    [Required, MaxLength(200)] string Name,
+    [Range(0.01, 100000)]      decimal Price,
+    [Range(0, int.MaxValue)]   int CurrentStock);
 ```
 
 What DTOs buy:

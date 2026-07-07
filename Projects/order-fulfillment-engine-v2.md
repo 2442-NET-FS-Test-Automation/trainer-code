@@ -304,6 +304,6 @@ here so none gets lost):
 
 Pitch it as a product: *"this is the service that fulfills our orders, and here is why it is correct and fast."*
 
-> **Looking ahead — Project 2 (Wk6–7):** you rewrite this Minimal-API service as a **controller-based API**
-> (controllers, DTOs, a service layer, AutoMapper, middleware) and put a **React front end** on it. The DI/EF
-> wiring you built here carries straight over — the rewrite is structural, not a restart.
+> **Looking ahead — Project 2 (Wk6–7):** you build a **controller-based API** for your domain — scaffolded fresh (`dotnet new webapi --use-controllers`, the workflow demoed in `06a`)
+> — with controllers, DTOs, a service layer, AutoMapper, and middleware, then put a **React front end** on it. Your data core/EF
+> wiring carries straight over (reference your data project from the new edge) — structural, not a restart.

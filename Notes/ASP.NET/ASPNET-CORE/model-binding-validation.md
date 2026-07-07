@@ -61,14 +61,14 @@ request," not "shape the column":
 
 ```csharp
 public record InventoryCreateDto(
-    [property: Required, MaxLength(20)]  string Sku,
-    [property: Required, MaxLength(200)] string Name,
-    [property: Range(0.01, 100000)]      decimal Price,
-    [property: Range(0, int.MaxValue)]   int CurrentStock);
+    [Required, MaxLength(20)]  string Sku,
+    [Required, MaxLength(200)] string Name,
+    [Range(0.01, 100000)]      decimal Price,
+    [Range(0, int.MaxValue)]   int CurrentStock);
 ```
 
-(The `[property:]` target is a record-positional-parameter detail — it aims the attribute at the generated
-property.) The working set: `[Required]`, `[MaxLength]`/`[MinLength]`/`[StringLength]`, `[Range]`,
+(On record positional parameters the annotations stay on the CONSTRUCTOR PARAMETER — a `[property:]` target
+aims them at the generated property, where MVC refuses them and throws at request time.) The working set: `[Required]`, `[MaxLength]`/`[MinLength]`/`[StringLength]`, `[Range]`,
 `[EmailAddress]`, `[RegularExpression]`, and `[CustomValidation]`/`IValidatableObject` when a rule spans
 properties.
 
