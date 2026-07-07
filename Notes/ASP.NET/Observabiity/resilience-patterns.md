@@ -59,10 +59,10 @@ The repository pattern puts data access behind a seam the rest of the app depend
 ```csharp
 public interface IInventoryRepository
 {
-    Task<IReadOnlyList<InventoryItem>> AllAsync(CancellationToken ct = default);
-    Task<InventoryItem?> BySkuAsync(string sku, CancellationToken ct = default);
-    Task<InventoryItem> AddAsync(string sku, string name, decimal price, int quantity, CancellationToken ct = default);
-    Task<bool> RemoveAsync(string sku, CancellationToken ct = default);
+    Task<IReadOnlyList<InventoryItem>> GetAllAsync();
+    Task<InventoryItem?> GetInventoryItemBySkuAsync(string sku);
+    Task<InventoryItem> AddInventoryItemAsync(string sku, string name, decimal price, int quantity);
+    Task<bool> RemoveBySkuAsync(string sku);
 }
 
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();   // consumers see only the interface
