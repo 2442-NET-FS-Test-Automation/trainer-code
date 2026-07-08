@@ -49,7 +49,7 @@ What DTOs buy:
 registered behind an interface:
 
 ```csharp
-public interface IInventoryQuery
+public interface IInventoryService
 {
     Task<IReadOnlyList<InventoryItem>> AllAsync();
     Task<InventoryItem?> BySkuAsync(string sku);
@@ -57,11 +57,11 @@ public interface IInventoryQuery
     Task<bool> RemoveAsync(string sku);
 }
 
-builder.Services.AddScoped<IInventoryQuery, InventoryQuery>();   // DI: interface -> implementation
+builder.Services.AddScoped<IInventoryService, InventoryService>();   // DI: interface -> implementation
 ```
 
 The layering is deliberately legible: **controller** (HTTP concerns: routes, status codes, DTO mapping) ->
-**`IInventoryQuery`** (the API's operations) -> **`IInventoryRepository`** (persistence,
+**`IInventoryService`** (the API's operations) -> **`IInventoryRepository`** (persistence,
 `../05-observability-patterns/resilience-patterns.md`) -> EF. Each layer has one reason to change — that
 is **separation of concerns** as an architecture answer, not a slogan: HTTP changes touch the controller,
 operation changes touch the service, query changes touch the repository. And because the controller
@@ -86,7 +86,7 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MappingProfile).Assembl
 
 ```csharp
 // in the controller (IMapper injected):
-Ok(_mapper.Map<List<InventoryDto>>(await _query.AllAsync()));
+Ok(_mapper.Map<List<InventoryDto>>(await _service.AllAsync()));
 ```
 
 Same-named members map automatically; you configure only the exceptions (here: the flattening from

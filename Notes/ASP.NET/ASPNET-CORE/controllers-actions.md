@@ -22,33 +22,33 @@ An inventory controller, annotated line by line:
 [Route("api/[controller]")]              // token -> class name minus "Controller": /api/inventory
 public class InventoryController : ControllerBase        // ControllerBase = API base (no views)
 {
-    private readonly IInventoryQuery _query;             // constructor DI, same container as before
+    private readonly IInventoryService _service;             // constructor DI, same container as before
     private readonly IMapper _mapper;
-    public InventoryController(IInventoryQuery query, IMapper mapper)
-    { _query = query; _mapper = mapper; }
+    public InventoryController(IInventoryService query, IMapper mapper)
+    { _service = query; _mapper = mapper; }
 
     [HttpGet]                                            // GET /api/inventory
     public async Task<ActionResult<IEnumerable<InventoryDto>>> Get()
-        => Ok(_mapper.Map<List<InventoryDto>>(await _query.AllAsync()));
+        => Ok(_mapper.Map<List<InventoryDto>>(await _service.AllAsync()));
 
     [HttpGet("{sku}")]                                   // GET /api/inventory/BK-001
     public async Task<ActionResult<InventoryDto>> GetBySku(string sku)
     {
-        var item = await _query.BySkuAsync(sku);
+        var item = await _service.BySkuAsync(sku);
         return item is null ? NotFound() : Ok(_mapper.Map<InventoryDto>(item));   // 404 vs 200
     }
 
     [HttpPost]                                           // POST /api/inventory
     public async Task<ActionResult<InventoryDto>> Create(InventoryCreateDto dto)
     {
-        var created = await _query.AddAsync(dto);
+        var created = await _service.AddAsync(dto);
         var read = _mapper.Map<InventoryDto>(created);
         return CreatedAtAction(nameof(GetBySku), new { sku = read.Sku }, read);   // 201 + Location
     }
 
     [HttpDelete("{sku}")]                                // DELETE /api/inventory/BK-001
     public async Task<IActionResult> Delete(string sku)
-        => await _query.RemoveAsync(sku) ? NoContent() : NotFound();              // 204 vs 404
+        => await _service.RemoveAsync(sku) ? NoContent() : NotFound();              // 204 vs 404
 }
 ```
 
