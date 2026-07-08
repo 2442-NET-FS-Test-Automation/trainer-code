@@ -76,10 +76,17 @@ string IssueToken(string user)
 }
 ```
 
-Protecting an endpoint is one attribute, and the round trip is observable with curl:
+Protecting an endpoint is one call (the demo guards a minimal-API endpoint; on a controller action the
+same gate is spelled `[Authorize]` — one attribute, same 401), and the round trip is observable with curl:
 
 ```csharp
-[Authorize]                                   // no valid token -> 401; the body never runs
+// Minimal API (the demo's shape):
+app.MapGet("/api/inventory/{sku}/supplier-price", async (string sku, ISupplierClient supplier,
+    CancellationToken ct) => ...)
+    .RequireAuthorization();                  // no valid token -> 401; the handler never runs
+
+// Controller spelling of the identical gate:
+[Authorize]
 [HttpGet("{sku}/supplier-price")]
 public async Task<ActionResult<object>> SupplierPrice(...) => ...;
 ```

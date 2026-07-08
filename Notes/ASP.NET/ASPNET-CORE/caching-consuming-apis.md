@@ -28,30 +28,38 @@ public async Task<ActionResult<IEnumerable<InventoryDto>>> Get() => ...;
 ```
 
 **In-memory caching** (`IMemoryCache`) stores *your* objects server-side, keyed, with expiration — finer
-grained, works for any data, invisible to HTTP:
+grained, works for any data, invisible to HTTP. Inject it into the controller like any other service and
+wrap the hot read:
 
 ```csharp
-builder.Services.AddMemoryCache();
+builder.Services.AddMemoryCache();          // Program.cs
 
-app.MapGet("/catalog/cached", async (IMemoryCache cache, IDbContextFactory<LibraryDbContext> f,
-    CancellationToken ct) =>
-    await cache.GetOrCreateAsync("catalog", async entry =>
+// InventoryController: IMemoryCache _cache injected via the constructor
+[HttpGet]
+[ResponseCache(Duration = 30)]              // layer 2: HTTP
+public async Task<ActionResult<IEnumerable<InventoryDto>>> Get()
+{
+    var dtos = await _cache.GetOrCreateAsync("inventory:all", async entry =>
     {
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30);
-        await using var db = await f.CreateDbContextAsync(ct);
-        return await db.Inventory.Include(i => i.Product).OrderBy(i => i.Product.Sku)
-            .Select(i => new { i.Product.Sku, i.Product.Name, i.CurrentStock })
-            .ToListAsync(ct);
-    }));
+        var items = await _service.AllAsync();      // layer 1: only runs on a cache MISS
+        return _mapper.Map<List<InventoryDto>>(items);
+    });
+    return Ok(dtos);
+}
 ```
 
 `GetOrCreateAsync` is the whole pattern: hit -> return cached; miss -> run the factory once, cache, return.
 
 ### What may be cached (the domain judgment)
-Caching is a *correctness* decision wearing a performance costume. The rule for an inventory domain:
-**cache the slow-changing catalog shape (SKUs, names), never the live stock counts.** A stale product name
-is harmless; a stale `CurrentStock` re-introduces the oversell lie the concurrency machinery exists to
-prevent — a cached "5 on hand" served during a burst is wrong the moment the first order commits.
+Caching is a *correctness* decision wearing a performance costume. In an inventory domain a stale product
+name is harmless, but a stale `CurrentStock` re-introduces the oversell lie the concurrency machinery
+exists to prevent — a cached "5 on hand" served during a burst is wrong the moment the first order
+commits. So caching live data is only legal when **every write invalidates**: the demo's `Create` and
+`Delete` each run `_cache.Remove("inventory:all")`, so the next read rebuilds fresh. Expiry alone is fine
+for slow-changing shapes (catalog names); write-path eviction is the price of caching anything live.
+And the layers are independent — evicting `IMemoryCache` does not clear a response the HTTP layer already
+stored; that one ages out with `max-age` (or a client sends `Cache-Control: no-cache`).
 Checklist before caching anything: How stale is acceptable? Who invalidates it (expiry, or explicit
 removal on write)? Is this data per-user (never response-cache authenticated, personalized responses)?
 REST's "cacheable" principle (`../02-rest-http/rest-principles.md`) is exactly this, done with headers.
@@ -102,9 +110,9 @@ contract of DTOs, not of entities.
 - *"Response caching replays whole HTTP responses via `Cache-Control` headers without running the action;
   in-memory caching stores keyed objects server-side with expiration — `GetOrCreateAsync` is the whole
   pattern."*
-- *"Caching is a correctness decision: I'd cache the slow-changing catalog shape but never live stock —
-  a cached count re-introduces the oversell bug. My checklist: acceptable staleness, invalidation owner,
-  and never response-caching personalized data."*
+- *"Caching is a correctness decision: live stock may only be cached because every write evicts the key —
+  a cached count without invalidation re-introduces the oversell bug. My checklist: acceptable staleness,
+  invalidation owner, and never response-caching personalized data."*
 - *"`new HttpClient()` per call exhausts sockets; one eternal client caches DNS forever.
   `IHttpClientFactory` pools handlers and solves both, and the typed-client pattern gives me an interface
   seam to fake in tests."*
@@ -114,7 +122,8 @@ contract of DTOs, not of entities.
 ## Check Yourself
 1. `[ResponseCache(Duration = 30)]` vs `IMemoryCache.GetOrCreateAsync` — what layer does each operate at,
    and who can serve the cached copy?
-2. Why is caching `CurrentStock` a correctness bug rather than a staleness inconvenience?
+2. Why is caching `CurrentStock` *without invalidation* a correctness bug rather than a staleness
+   inconvenience — and what makes it safe in the demo?
 3. Name the two failure modes of managing `HttpClient` yourself, and what solves both.
 4. In the supplier client, why does "no match" return `null` while "supplier unreachable" throws?
 5. What three questions do you ask before caching any piece of data?
@@ -123,7 +132,8 @@ contract of DTOs, not of entities.
 **Answers:** (1) Response caching: the HTTP layer — the framework or any intermediary proxy can replay it;
 memory cache: inside your process — only your code reads it. (2) Stock is the value concurrency control
 protects; serving a cached count during concurrent writes reasserts the stale read the RowVersion
-machinery eliminated — oversell returns. (3) Socket exhaustion (client per call) and stale DNS (one
+machinery eliminated — oversell returns. It's safe in the demo because every write path (`Create`,
+`Delete`) evicts the key, so no read outlives the data it describes. (3) Socket exhaustion (client per call) and stale DNS (one
 eternal client); `IHttpClientFactory` handler pooling. (4) No match is a *data outcome* the caller maps to
 404; unreachable is a *dependency failure* — throwing lets the global handler produce an honest 500
 instead of masking the outage. (5) How stale is acceptable? Who invalidates it? Is it per-user/
@@ -133,8 +143,9 @@ v2 shapes can coexist over one model.
 ## Summary
 - Response caching = whole responses via `Cache-Control` (middleware + `[ResponseCache]`); memory caching
   = keyed server-side objects (`GetOrCreateAsync` + expiration).
-- Cache by domain judgment: catalog shape yes, live stock never; staleness and invalidation are part of
-  the design, not afterthoughts.
+- Cache by domain judgment: expiry alone suits slow-changing shapes; live data demands write-path
+  eviction (`_cache.Remove` on every mutation) — staleness and invalidation are part of the design, not
+  afterthoughts.
 - `IHttpClientFactory` typed clients: pooled handlers, one configuration point, an interface seam;
   null for no-match, throw (-> global 500) for a dead dependency.
 - Versioning = parallel contracts (`/v1`, `/v2`) enabled by DTO discipline; know why even before you build

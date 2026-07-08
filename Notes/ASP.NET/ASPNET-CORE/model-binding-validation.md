@@ -43,10 +43,11 @@ public IActionResult Get(
 [HttpPost]
 public IActionResult Create([FromBody] InventoryCreateDto dto) => ...;   // explicit body
 
-// [FromServices] pulls DI into a single action instead of the constructor:
-[HttpGet("{sku}/supplier-price")]
-public async Task<ActionResult<object>> SupplierPrice(
-    string sku, [FromServices] ISupplierClient supplier, CancellationToken ct) => ...;
+// [FromServices] pulls DI into a single action instead of the constructor —
+// handy when only one action needs a service:
+[HttpGet("{sku}/report")]
+public async Task<ActionResult<object>> Report(
+    string sku, [FromServices] IReportWriter writer, CancellationToken ct) => ...;
 ```
 
 Notes that save debugging time: only **one** parameter may bind from the body (JSON is a stream, read
