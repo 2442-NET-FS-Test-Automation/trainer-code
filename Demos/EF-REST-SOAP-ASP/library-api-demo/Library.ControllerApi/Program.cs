@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Adding connection string 
-var conn_string = "Server=localhost,1433;Database=LibraryMinimalDb;User Id=sa;Password=LibraryPass1!;TrustServerCertificate=true";
+var conn_string = builder.Configuration.GetConnectionString("Library") ?? 
+    "Server=localhost,1433;Database=LibraryMinimalDb;User Id=sa;Password=LibraryPass1!;TrustServerCertificate=true";
 
 
 Log.Logger = new LoggerConfiguration()
@@ -88,3 +89,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+Log.CloseAndFlush();
+
+// Week 8 integration-testing hook: WebApplicationFactory<Program>
+// needs a visible Program type. Since .NET 10 the SDK generates
+// `public partial class Program` for you - writing it yourself
+// triggers ASP0027. Nothing to add; Week 8's factory just finds it.
