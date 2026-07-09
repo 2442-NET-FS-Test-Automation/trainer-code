@@ -62,13 +62,14 @@ builder.Services.AddAuthorization();
 ```
 
 Issuing, reduced to its skeleton (a real system authenticates credentials first — that step is a login
-flow of its own):
+flow of its own). Issuance belongs in an injected **service** — the demo's `TokenService : ITokenService`,
+registered `AddSingleton`, the same DI shape as any other dependency:
 
 ```csharp
-string IssueToken(string user)
+public string Issue(string user)   // TokenService - validation's mirror: same key, issuer, audience
 {
     var creds = new SigningCredentials(
-        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)), SecurityAlgorithms.HmacSha256);
+        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)), SecurityAlgorithms.HmacSha256);
     var token = new JwtSecurityToken("library-fulfillment", "library-fulfillment-clients",
         new[] { new Claim(ClaimTypes.Name, user) },
         expires: DateTime.UtcNow.AddHours(1), signingCredentials: creds);
@@ -76,19 +77,19 @@ string IssueToken(string user)
 }
 ```
 
-Protecting an endpoint is one call (the demo guards a minimal-API endpoint; on a controller action the
-same gate is spelled `[Authorize]` — one attribute, same 401), and the round trip is observable with curl:
+Issuer and validator **must agree** on key, issuer, and audience — a mismatch means tokens you just minted
+come back 401. Protecting an endpoint is one attribute (the demo guards a controller action; on a
+minimal-API endpoint the same gate is spelled `.RequireAuthorization()` — one gate, same 401), and the
+round trip is observable with curl:
 
 ```csharp
-// Minimal API (the demo's shape):
-app.MapGet("/api/inventory/{sku}/supplier-price", async (string sku, ISupplierClient supplier,
-    CancellationToken ct) => ...)
-    .RequireAuthorization();                  // no valid token -> 401; the handler never runs
-
-// Controller spelling of the identical gate:
-[Authorize]
+// Controller action (the demo's shape - InventoryController):
 [HttpGet("{sku}/supplier-price")]
-public async Task<ActionResult<object>> SupplierPrice(...) => ...;
+[Authorize]                               // no valid token -> 401; the action never runs
+public async Task<ActionResult> GetSupplierPrice(string sku, CancellationToken ct) => ...;
+
+// Minimal-API spelling of the identical gate:
+app.MapGet("/api/inventory/{sku}/supplier-price", ...).RequireAuthorization();
 ```
 
 ```bash
@@ -104,11 +105,12 @@ management, is rotated, and is never committed to source. A constant fallback ke
 so it runs without setup — label it loudly and treat it as the first thing to fix.
 
 ### The cookie carrier and its flags
-A browser front end can carry the same token in a **cookie** instead of a header — and then the flags are
+A browser front end can carry the same token in a **cookie** instead of a header (the demo's
+`AuthController` serves both carriers from the same `ITokenService`) — and then the flags are
 the entire lesson:
 
 ```csharp
-ctx.Response.Cookies.Append("auth", IssueToken(user), new CookieOptions
+Response.Cookies.Append("auth", _tokens.Issue(user), new CookieOptions
 {
     HttpOnly = true,                 // JavaScript cannot read it -> XSS cannot steal it
     Secure   = true,                 // HTTPS only -> never sent in cleartext

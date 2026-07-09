@@ -93,8 +93,10 @@ public class SupplierClient : ISupplierClient
 Why the factory instead of `new HttpClient()`: it pools and recycles the underlying handlers, avoiding
 both socket exhaustion (a new client per call leaks OS sockets) and stale-DNS (a single eternal client
 never re-resolves). The **typed client** pattern adds the seams you already value: consumers depend on
-`ISupplierClient`, tests fake it, and the base address/headers live in one registration. Design notes
-visible in the code: the token is forwarded; "no match" is a `null` (the controller turns it into 404); an
+`ISupplierClient`, tests fake it, and the base address/headers live in one registration. Consumption is
+plain constructor injection — the demo's `InventoryController` takes `ISupplierClient` as its fourth
+dependency, exactly like the service and the cache. Design notes visible in the code: the
+`CancellationToken` is forwarded; "no match" is a `null` (the controller turns it into 404); an
 unreachable supplier *throws*, and the global exception middleware makes that a clean 500 — deliberately
 online-or-not-at-all rather than hiding failures behind a fake fallback.
 
