@@ -1,9 +1,12 @@
+using System.Text;
 using Library.ControllerApi.Filters;
 using Library.ControllerApi.Mapping;
 using Library.ControllerApi.Middleware;
 using Library.ControllerApi.Services;
 using Library.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +32,28 @@ builder.Services.AddCors(o => o.AddPolicy(SpaCorsPolicy, p => p
     .AllowAnyHeader()
     .AllowAnyMethod()
 ));
+
+
+// VALIDATION side of JWT. Issuance lives in TokenService
+var jwtKey = builder.Configuration["Jwt:Key"]; //from appsettings.Development.json
+
+// Hardcoding the issuer and audience - these have to match the ones we set on the token
+const string jwtIssuer = "library-fulfillment";
+const string jwtAudience = "library-fulfillment-clients";
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters
+    {
+       ValidateIssuer = true, ValidIssuer = jwtIssuer,
+       ValidateAudience = true, ValidAudience = jwtAudience,
+       ValidateIssuerSigningKey = true, IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+       ValidateLifetime = true
+    });
+
+builder.Services.AddAuthorization(); // goes after authentication
+
+// Token Issuance is a plain injectable service. Its stateless so we can use a singleton
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 // Adding our HttpClient
 builder.Services.AddHttpClient<ISupplierClient, SupplierClient>(c => 
@@ -104,11 +129,13 @@ app.UseResponseCaching(); // using the response cache middleware
 
 app.UseCors(SpaCorsPolicy); //using our policy, with the CORS middleware
 
+//Must be in this order for Authn/Authz
+app.UseAuthentication(); // read and validate the tokens -> set User
+app.UseAuthorization(); // enforces the [Authorize] / RequireAuthorization() decorators on endpoints 
+
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 
