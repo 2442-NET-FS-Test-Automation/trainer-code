@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library - Sign in</title>
+
+    <!-- This is internal CSS styling - centralized but within the HTML file itself. -->
+    <style>
+        .internal { color: green}
+    </style>
+
+</head>
+<body>
+
+    <header class="site-header"> 
+        <h1 id="heading">City Library</h1> <!-- These are HTML elements. -->
+        <nav class="site-nav">
+            <a href="index.html">Catalog</a> <!-- Elements can have attributes, like href
+                                                  which lets your browser know what HTML page
+                                                    to load when you click the link   -->
+            <a href="login.html">Sign in</a> 
+        </nav>
+    </header>
+
+    <main>
+        <!-- Forms are groups of inputs we intend to bundle together to send a request (POST)
+          Still used even with things like react - useful for grabbing multiple bits of user input
+            for use in JS or TS (like logging in with username + pass) -->
+        <form id="login-form" class="panel">
+            <div class="field">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="ada or bob">
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <button type="submit">Sign in</button>
+            <p id="login-status"></p>
+        </form>
+
+        <!-- Fieldsets are just used to group inputs on large forms - here we use them for demo-->
+        <fieldset>
+            <legend>Membership preferences (input-type tour)</legend>
+            
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="ada@library.dev">
+            </div>
+            
+            <div class="field">
+                <label for="member-since">Member since</label>
+                <input type="date" name="member-since" id="member-since">
+            </div>
+            
+            <div class="field">
+                <label for="loan-limit">Loan limit</label>
+                <input type="number" name="loan-limit" id="loan-limit" min="1" max="10" value="3">
+            </div>
+
+            <div class="field">
+                <label for="branch">Home branch</label>
+                <select name="branch" id="branch">
+                    <option>North</option>
+                    <option>Central</option>
+                    <option>South</option>
+                </select>
+            </div>
+            
+            <div class="field field-inline">
+                <input type="checkbox" id="newsletter" name="newsletter" checked>
+                <label for="newsletter">Email me the New Arrivals newsletter</label>
+            </div>
+
+            <div class="field field-inline">
+                <input type="radio" id="format-print" name="format" value="print" checked>
+                <label for="format-print">Print</label>
+                <input type="radio" id="format-ebook" name="format" value="ebook">
+                <label for="format-ebook">E-book</label>
+            </div>
+        </fieldset>
+
+    <!-- Inline CSS - right on the element itself in a style attribute -->
+        <p style="color: red;"> This tag is inline styled </p>
+        <p class="internal"">This tag is internally styled from the "head" section </p>
+    </main>
+
+    <footer>
+
+    </footer>
+
+</body>
+</html>
