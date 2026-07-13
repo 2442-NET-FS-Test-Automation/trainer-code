@@ -330,5 +330,5 @@ people can do the right things and nobody else can."*
 
 > **Looking ahead — Project 3 (Wk8–9):** you build **xUnit, Cypress, and Selenium test suites against
 > this application**. Keep it runnable, keep it seeded, keep the repo — your future self is the next
-> stakeholder. (QC-4, mid/late Week 6, examines the API-side techniques in this spec — building the MVP
-> **is** the study guide.)
+> stakeholder. (QC-4 — administered in the combined QC-3+QC-4 sitting, Friday Jul 17 AM — examines the
+> API-side techniques in this spec — building the MVP **is** the study guide.)
