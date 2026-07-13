@@ -13,13 +13,28 @@ var builder = WebApplication.CreateBuilder(args);
 var conn_string = builder.Configuration.GetConnectionString("Library") ?? 
     "Server=localhost,1433;Database=LibraryMinimalDb;User Id=sa;Password=LibraryPass1!;TrustServerCertificate=true";
 
-
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console() // Write to console, and write to a file - starting a new file each day.
     .WriteTo.File("logs/fulfillment-log-.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog(); // Tell the builder to use Serilog for logging
+
+// Adding CORS 
+const string SpaCorsPolicy = "spa"; // string name for our policy 
+
+// Configuring our CORS policy
+builder.Services.AddCors(o => o.AddPolicy(SpaCorsPolicy, p => p
+    .WithOrigins("http://localhost:3000")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+));
+
+// Adding our HttpClient
+builder.Services.AddHttpClient<ISupplierClient, SupplierClient>(c => 
+    c.BaseAddress = new Uri("https://dummyjson.com/") // all calls append to this URL
+);
+
 
 builder.Services.AddDbContextFactory<LibraryDbContext>(o => o.UseSqlServer(conn_string));
 
@@ -38,6 +53,11 @@ builder.Services.AddOpenApi();
 
 // Adding swagger back
 builder.Services.AddSwaggerGen();
+
+// Adding caching
+builder.Services.AddMemoryCache(); // adding cache-ing to our server
+builder.Services.AddResponseCaching(); // adding response cache-ing - asking the front end to save request results 
+
 
 var app = builder.Build();
 
@@ -80,6 +100,10 @@ app.Use(async (ctx, next) =>
     await next(ctx);
 });
 
+app.UseResponseCaching(); // using the response cache middleware
+
+app.UseCors(SpaCorsPolicy); //using our policy, with the CORS middleware
+
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
@@ -89,9 +113,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-Log.CloseAndFlush();
 
-// Week 8 integration-testing hook: WebApplicationFactory<Program>
-// needs a visible Program type. Since .NET 10 the SDK generates
-// `public partial class Program` for you - writing it yourself
-// triggers ASP0027. Nothing to add; Week 8's factory just finds it.
+Log.CloseAndFlush(); // Close and flush the logs (serilog)
