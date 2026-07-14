@@ -4,7 +4,9 @@ using Library.ControllerApi.Mapping;
 using Library.ControllerApi.Middleware;
 using Library.ControllerApi.Services;
 using Library.Data;
+using Library.Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -63,9 +65,13 @@ builder.Services.AddHttpClient<ISupplierClient, SupplierClient>(c =>
 
 builder.Services.AddDbContextFactory<LibraryDbContext>(o => o.UseSqlServer(conn_string));
 
+// Adding the password hasher
+builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+
 // Registering our custom Repo and Service Layer methods like we did before
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>(); // Could later swap for InventoryMongoRepo
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Adding our mapping profile for AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MappingProfile).Assembly));
@@ -85,6 +91,29 @@ builder.Services.AddResponseCaching(); // adding response cache-ing - asking the
 
 
 var app = builder.Build();
+
+// Seeding admins - cant do a plain INSERT INTO using SQL because I won't have a hashed password
+// might be able to do it in LibraryDbContext - would have to check how to do that.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+
+    // We want this to be idempotent. This block of code runs EVERY time the app starts
+    // BUT we only want to seed our admin(s) ONCE. 
+    if (!db.Users.Any(u => u.Role == "admin"))
+    {
+        var hasher = new PasswordHasher<User>();
+        var admin = new User { Username = "ada", Role = "admin"};
+
+        // I should put that password inside of some secret (non GH committed) file. 
+        admin.PasswordHash = hasher.HashPassword(admin, "pass123!"); // put this in a config file pls!
+
+        db.Users.Add(admin);
+        db.SaveChanges();
+    }
+
+}
+
 
 app.UseMiddleware<ExceptionHandlingMiddleware>(); // wraps all middleware below it, catches their exceptions
 

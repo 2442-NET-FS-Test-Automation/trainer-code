@@ -45,7 +45,7 @@ namespace Library.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
 
                     b.HasData(
                         new
@@ -82,7 +82,7 @@ namespace Library.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FulfillmentEvents");
+                    b.ToTable("FulfillmentEvents", (string)null);
                 });
 
             modelBuilder.Entity("Library.Data.Entities.InventoryItem", b =>
@@ -110,7 +110,7 @@ namespace Library.Data.Migrations
                     b.HasIndex("ProductId")
                         .IsUnique();
 
-                    b.ToTable("Inventory");
+                    b.ToTable("Inventory", (string)null);
 
                     b.HasData(
                         new
@@ -160,7 +160,7 @@ namespace Library.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Library.Data.Entities.OrderLine", b =>
@@ -184,7 +184,7 @@ namespace Library.Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderLines");
+                    b.ToTable("OrderLines", (string)null);
                 });
 
             modelBuilder.Entity("Library.Data.Entities.Product", b =>
@@ -212,7 +212,7 @@ namespace Library.Data.Migrations
                     b.HasIndex("Sku")
                         .IsUnique();
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
 
                     b.HasData(
                         new

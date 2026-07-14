@@ -32,7 +32,7 @@ public class TokenService : ITokenService
     // This token, once the front end has it (i.e. User has logged in), gets appended to every
     // http request. For some endpoints, we will validate the token, and if the user isn't authorized to do
     // a given action we send back 401 unauthorized
-    public string Issue(string user)
+    public string Issue(string user, string role)
     {
         // Sign the token with a symmetric key (HMAC-SHA256) - the key bust be >= 32 bytes
         var creds = new SigningCredentials(
@@ -40,7 +40,7 @@ public class TokenService : ITokenService
 
         // If user = "ada" they get admin, otherwise they get "consumer"
         // temp code
-        var role = Roles.GetValueOrDefault(user, "consumer");
+        //var role = Roles.GetValueOrDefault(user, "consumer");
 
         // Once we have creds (that key we can sign with) we can register claims
         // things like user role. We can also give the key an expiration date/time
