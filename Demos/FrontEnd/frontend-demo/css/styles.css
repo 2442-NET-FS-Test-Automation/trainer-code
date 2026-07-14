@@ -130,3 +130,78 @@ button {
     padding: 0.5rem 1rem;
     cursor: pointer;
 }
+
+/* Lets render the catalog with Grid */
+
+.cards {
+    display: grid;
+    /* make as many 14rem columns as fit - more responsive with no media queries */
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: var(--card-gap)
+}
+
+.card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: var(--radius);
+    padding: 1rem;
+    animation: fade-in 0.4s ease-in;
+}
+
+.card h3 {
+    margin-top: 0;
+    color: var(--brand)
+}
+
+/* Some final selectors*/
+
+/* Pseudo class - links inside site nav but only when I hover over them */
+.site-nav a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Adjacent sibling (+) - an element immediately after some other other element 
+    lets you do things like select every p element that falls immediately after an h1*/
+#search + .hint {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* Descendant selector (the space we've been using) - any element inside the specified outer element */
+.toolbar label {
+    font-weight: 600;
+}
+
+.card dl dd {
+    margin-left: 0;
+    font-weight: 600;
+}
+
+/* We can use things like n-th child to select even and odd child elements whatever they are */
+.cards .card:nth-child(odd) {
+    background: var(--brand-light);
+}
+
+/* We can also just select via attributes directly that aren't class or id */
+input[type="checkbox"], input[type="radio"] {
+    accent-color: var(--brand);
+}
+
+button:hover {
+    filter: brightness(1.15);
+}
+
+/* We can make our site responsive with media queries - applying certain rules based on the size the site is being viewed on. */
+
+/* Below 40rem stack the header */
+@media (max-width: 40rem) {
+    .site-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@keyframes fade-in {
+    from {opacity: 0; transform: translateY(4px); }
+    to {opacity: 1; transform: none;}
+}
