@@ -4,6 +4,7 @@ using Library.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Library.Data.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    partial class LibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260709220845_Users")]
+    partial class Users
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +48,7 @@ namespace Library.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
 
                     b.HasData(
                         new
@@ -82,7 +85,7 @@ namespace Library.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FulfillmentEvents", (string)null);
+                    b.ToTable("FulfillmentEvents");
                 });
 
             modelBuilder.Entity("Library.Data.Entities.InventoryItem", b =>
@@ -110,7 +113,7 @@ namespace Library.Data.Migrations
                     b.HasIndex("ProductId")
                         .IsUnique();
 
-                    b.ToTable("Inventory", (string)null);
+                    b.ToTable("Inventory");
 
                     b.HasData(
                         new
@@ -160,7 +163,7 @@ namespace Library.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Library.Data.Entities.OrderLine", b =>
@@ -184,7 +187,7 @@ namespace Library.Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderLines", (string)null);
+                    b.ToTable("OrderLines");
                 });
 
             modelBuilder.Entity("Library.Data.Entities.Product", b =>
@@ -212,7 +215,7 @@ namespace Library.Data.Migrations
                     b.HasIndex("Sku")
                         .IsUnique();
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
 
                     b.HasData(
                         new
@@ -264,7 +267,7 @@ namespace Library.Data.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Library.Data.Entities.InventoryItem", b =>
