@@ -174,7 +174,7 @@ criteria are what you point at on Friday.
   configured for the SPA origin. Know what order your pipeline runs in and why — the HTTP-pipeline
   question is a QC-4 Must.
 
-### AuthN / AuthZ (hand-rolled, the `07` shape)
+### AuthN / AuthZ 
 
 - A **Users table of your own design** (id, unique username/email, password hash + salt, role).
   **No ASP.NET Identity** — it is untaught and does the thinking this project wants you to do.
@@ -211,7 +211,7 @@ criteria are what you point at on Friday.
 - Honest CSS: layout via flexbox/grid, responsive enough to survive a projector. This is not a design
   course — it is a "does not look broken" bar.
 
-### Team workflow (light Agile — this is graded evidence, not ceremony)
+### Team workflow
 
 - **One shared repo** (one member hosts, all three collaborate). **Nobody pushes to `main` directly** —
   every change lands by **feature-branch PR reviewed by a teammate** before merge.
