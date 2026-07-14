@@ -36,7 +36,7 @@ body {
 main {
     max-width: 60rem;
     margin: 0 auto; 
-    padding: 1rem, 1.5rem
+    padding: 1rem 1.5rem;
 }
 
 /* ID Selectors - selecting individual elements via id attributes in the HTML */
@@ -90,9 +90,9 @@ main {
 }
 
 .site-nav a {
-    color: color;
+    color: white;
     text-decoration: none; /*gets rid of that underline for links*/
-    padding: 0.25rem, 0.5rem;
+    padding: 0.25rem 0.5rem;
     border-radius: var(--radius);
 }
 
