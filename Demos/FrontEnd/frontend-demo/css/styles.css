@@ -29,7 +29,7 @@ body {
 /* We can use wildcards if we want to - useful for selecting "everything" 
     as well as when using combined or complex selectors later */
 
-* {
+*, *::before, *::after{
     box-sizing: border-box;
 }
 
