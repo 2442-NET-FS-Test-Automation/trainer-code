@@ -1,0 +1,132 @@
+/* External styling - one stylesheet for every page on my site. */
+
+/* CSS Variables + pseudo-class of "root" */
+
+/* Root is a pseudo-class - it lets us select elements based on stuff from outside the 
+ DOM hierarchy. For example :root stands for the highest element in the hierarchy.
+ Other examples include pseudo classes that represent different element states. 
+ things like changing style when you hover over a button with button:hover */
+:root {
+    --brand: #1f4e79;
+    --brand-light: #eaf1f8;
+    --danger: #a4262c;
+    --card-gap: 1rem;
+    --radius: 8px;
+}
+
+/* CSS Selectors */
+
+/* Element selectors: apply styling to all elements of that type on a page.*/
+
+/* applies to every <body> element */
+body {
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    color: #222;
+    background: #fafafa;
+}
+
+/* We can use wildcards if we want to - useful for selecting "everything" 
+    as well as when using combined or complex selectors later */
+
+* {
+    box-sizing: border-box;
+}
+
+main {
+    max-width: 60rem;
+    margin: 0 auto; 
+    padding: 1rem, 1.5rem
+}
+
+/* ID Selectors - selecting individual elements via id attributes in the HTML */
+#search {
+    /* When playing with things like margin, padding, etc its common to see more than one value set
+    Padding with one value sets that valure for top/bottom/left/right. With two values it sets the first
+    for top/bottom and the second for left/right, and so on.*/
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #bbb;
+    border-radius: var(--radius);
+}
+
+/* Class selectors - select groups of related elements via class attributes in the HTML */
+
+.panel {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: var(--radius); /* calling on a variable using var() */
+    padding: 1rem;
+    margin-bottom: 1rem;
+    max-width: 28rem;
+}
+
+.site-footer {
+    text-align: center;
+    color: #666;
+    padding: 1rem;
+}
+
+/* Flexbox - One dimensional layouts - useful for things like menu bars 
+    lets use flexbox for the navbar*/
+
+.site-header {
+    display:flex; /* This elements children (elements rendering inside it) flow in one axis (left-right) */
+    justify-content: space-between;
+    align-items: center; /* center the items vertically */
+    background: var(--brand);
+    color: white;
+    padding: 0.75rem 1.5rem; 
+}
+
+/* Every h1 inside of things with the site-header class */
+.site-header h1 {
+    margin: 0;
+    font-size:  1.25rem;
+}
+
+.site-nav {
+    display: flex;
+    gap: 1rem;
+}
+
+.site-nav a {
+    color: color;
+    text-decoration: none; /*gets rid of that underline for links*/
+    padding: 0.25rem, 0.5rem;
+    border-radius: var(--radius);
+}
+
+.toolbar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;       /* flexbox again - now the vertical axis */
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.field-inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.field input, .field select {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #bbb;
+    border-radius: var(--radius);
+}
+
+button {
+    background: var(--brand);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
