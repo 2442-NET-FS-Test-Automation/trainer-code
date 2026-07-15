@@ -154,8 +154,10 @@ console.log(`${name} has ${stock} on the shelf`);     // Clean Code has 12 on th
 // it's whatever is LEFT OF THE DOT.
 console.log("--- 7. this + closures ---");
 
+
 const cart = {
     items: [],
+   
     add(item) {                       // method shorthand
         this.items.push(item);        // `this` = whatever is left of the dot at call time
         return this;                  // returning this enables chaining

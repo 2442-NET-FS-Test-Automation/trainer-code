@@ -30,7 +30,7 @@ const string SpaCorsPolicy = "spa"; // string name for our policy
 
 // Configuring our CORS policy
 builder.Services.AddCors(o => o.AddPolicy(SpaCorsPolicy, p => p
-    .WithOrigins("http://localhost:3000")
+    .WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
     .AllowAnyHeader()
     .AllowAnyMethod()
 ));
@@ -154,9 +154,12 @@ app.Use(async (ctx, next) =>
     await next(ctx);
 });
 
-app.UseResponseCaching(); // using the response cache middleware
-
 app.UseCors(SpaCorsPolicy); //using our policy, with the CORS middleware
+// CORS must run BEFORE response caching: a cached reply seeded by a request with no
+// Origin header would otherwise replay for 30s WITHOUT the Access-Control-Allow-Origin
+// header, and the browser fails the page's fetch intermittently.
+
+app.UseResponseCaching(); // using the response cache middleware
 
 //Must be in this order for Authn/Authz
 app.UseAuthentication(); // read and validate the tokens -> set User
