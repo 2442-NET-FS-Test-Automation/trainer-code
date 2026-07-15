@@ -32,31 +32,34 @@ typed in class to cite); the note carries the written treatment, and the cheat-s
 ## Scheduling note: REST vs SOAP (Nice-to-have)
 
 "Compare and contrast RESTful and SOAP-based web services..." is covered in writing in
-`content/07-soap/soap-vs-rest.md`, and its demo (`08-soap`) is scheduled **Tuesday July 14 PM** — before
-the Friday sitting. Study material in this package is grounded in the note; the demo adds a live
-envelope round-trip on the same Library service.
+`content/07-soap/soap-vs-rest.md`; its demo (`08-soap`) did not run Tuesday July 14 — the slot is
+floating (any Wk6 PM, else Wk7). Note coverage carries the row either way (Nice tier, no R-002
+exposure); the demo, when it lands, adds a live envelope round-trip on the same Library service.
 
 ## Notes-relegated DSA remainder (context, not a gap)
 
 The `02-dsa-complete` demo opener never ran in class (user decision 2026-07-02). Its material — sound
 binary search, measured Big-O timing, recursion + memoization, PriorityQueue, reflection — is covered by
 the `content/03-dsa/` notes plus the runnable answer-key commit `02-dsa-complete` (`c70c979`) in
-`weeklytechrepo/EFCore-REST-SOAP/demo/algorithms-threading-demo/`. The affected rubric rows (binary
-search Must, Big-O Must, priority-queue Should, arrays/linked-lists/hash-tables Should, the four
-recursion/memoization and merge-sort Nice rows) are all note-and-answer-key grounded — study them from
-the notes, then read the answer-key code.
+`weeklytechrepo/EFCore-REST-SOAP/demo/algorithms-threading-demo/`. The surviving rubric rows it grounds
+(binary search Must, Big-O Must, stack/queue/priority-queue Should, arrays/linked-lists/hash-tables
+Should) are note-and-answer-key grounded — study them from the notes, then read the answer-key code.
+(The recursion/memoization and merge-sort rows were cut from the rubric 2026-07-15 —
+`docs/status/QC3-QC4-CUT-ADJUDICATION-2026-07-15.md`; the notes remain for interview prep.)
 
 ## Future-week items
 
-No objective in **either rubric** is scheduled for a later week, so nothing from the 78 rows is
+No objective in **either rubric** is scheduled for a later week, so nothing from the 67 rows is
 anti-spoilered out of this package. (Frontend/React topics belong to QC-5 and appear nowhere here.)
 
-One carried item from the QC-1 register (`docs/status/QC1-Coverage-Analysis.md` section 5) is
+Carried items from the QC-1 register (`docs/status/QC1-Coverage-Analysis.md` section 5) that are
 **deferred to a later week** rather than absorbed here:
 
 | Carry item | Disposition |
 |---|---|
 | AAA | Deferred to a later week (user call 2026-07-13). Not a row in the QC-3 or QC-4 rubric, so it gets no study material in this package; it lands with a future week's material and whatever future evaluation covers it. |
+| SOA | Its absorbing row (QC-3 REST Should) was **cut 2026-07-15** — the topic never appeared on the delivered curricula (Microservices is Wk7). Re-registered as a future-week item; natural home = the Wk7 microservices material. Written coverage exists (`content/02-rest-http/rest-principles.md`). |
+| Sorting (describe + implement) | Its absorbing rows (QC-3 DSA sorting Must/Should/Nice) were **cut 2026-07-15** — sorting never appeared on the delivered curricula. Taught material stays (`content/03-dsa/sorting.md`, `Sorts.cs` answer key); lands with whatever future evaluation covers it. |
 
-The other QC-1 carry items are absorbed by this sitting's rubrics: Big-O and sorting land in the
-QC-3 DSA rows, SOA in the QC-3 REST Should row — all covered above.
+The remaining QC-1 carry item, Big-O, stays absorbed: its QC-3 DSA Must row survives the cut. Cut
+adjudication record: `docs/status/QC3-QC4-CUT-ADJUDICATION-2026-07-15.md`.

@@ -26,8 +26,6 @@ notes?"* Tick only what you can do unaided; every unticked box points you at the
 - [ ] Analyze a given problem and determine the appropriate data structures and algorithms to use.
 - [ ] Read, interpret, and debug existing code that utilizes data structures and algorithms, identifying their efficiency and purpose.
 - [ ] Demonstrate the ability to perform binary search on arrays or lists and be able to identify the syntax.
-- [ ] Explain the structure of tree and graph data structures
-- [ ] Describe the difference between common sorting algorithms
 
 ### EF Core (QC-3)
 - [ ] Create an EF Core model using EF Core code conventions.
@@ -60,19 +58,15 @@ notes?"* Tick only what you can do unaided; every unticked box points you at the
 
 ### REST (QC-3)
 - [ ] Describe URL conventions when using REST.
-- [ ] Describe SOA (Service Oriented Architecture) and be capable of diagramming the components of a sample system
 - [ ] Describe the difference between authorization and authentication.
 - [ ] Be capable of sending a POST request to a REST API using curl or Postman and populating the request body
-- [ ] Build a RESTful web service using a popular framework (e.g. Spring, Flask, Express)
+- [ ] Build a RESTful web service using a popular framework (e.g. ASP.NET Core Minimal API)
 
 ### DSA (QC-3)
 - [ ] Explain when to choose a stack, queue, or priority queue based on program requirements.
 - [ ] Evaluate the trade-offs between linear search and binary search in terms of time complexity and required data structure conditions.
 - [ ] Compare and contrast arrays, linked lists, and hash tables based on time efficiency for insertion, deletion, and lookup operations.
-- [ ] Demonstrate the ability to perform bubble sort on arrays or lists and be able to identify the syntax.
 - [ ] Be capable of explaining how to solve a given problem using the appropriate data structure and algorithm
-- [ ] Demonstrate the ability to perform insertion sort on arrays or lists and be able to identify the syntax.
-- [ ] Demonstrate the ability to perform selection sort on arrays or lists and be able to identify the syntax.
 
 ### EF Core (QC-3)
 - [ ] Create a dbcontext object in an application, and use it to manage persistance to a database.
@@ -91,7 +85,6 @@ notes?"* Tick only what you can do unaided; every unticked box points you at the
 ### ASP.NET Core (QC-4)
 - [ ] Implement model binding effectively.
 - [ ] Describe and implement data validation using annotations.
-- [ ] Demonstrate the use of automatic mapping for objects and DTOs.
 - [ ] Implement native ASP.NET middleware, such as Logging or Identity.
 - [ ] Implement HTTP response codes effectively.
 
@@ -100,12 +93,6 @@ notes?"* Tick only what you can do unaided; every unticked box points you at the
 ### REST (QC-3)
 - [ ] Implement authentication and authorization using a popular RESTful framework (e.g. OAuth, JWT)
 - [ ] Compare and contrast RESTful and SOAP-based web services in terms of functionality, performance, and scalability
-
-### DSA (QC-3)
-- [ ] Demonstrate the ability to perform merge sort on arrays or lists and be able to identify the syntax.
-- [ ] Explain the concept of recursion and identify the base case and recursive case in a method.
-- [ ] Demonstrate how to solve simple problems using recursion
-- [ ] Demonstrate how to optimize algorithms using memoization and tabulation
 
 ### EF Core (QC-3)
 - [ ] Call stored procedures and query  scalar types by dropping down to SQL, using FromSQL() and SqlQuery().

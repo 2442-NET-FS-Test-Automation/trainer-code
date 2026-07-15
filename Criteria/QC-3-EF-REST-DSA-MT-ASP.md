@@ -12,10 +12,9 @@
 | Must know | Describe the REST principles. | Client-server, stateless, cacheable, uniform interface, layered system, and code-on-demand (optional). |
 | Must know | Be capable of sending a GET request to an open source REST API using curl or Postman | `curl https://api.example.com/users` |
 | Should know | Describe URL conventions when using REST. | Use plural nouns for resources and nest for relationships: `/users`, `/users/1`, `/users/1/orders`. |
-| Should know | Describe SOA (Service Oriented Architecture) and be capable of diagramming the components of a sample system | Architecture of loosely coupled services communicating over a network; e.g. Client -> API Gateway -> [Auth Service, Order Service] -> Database. |
 | Should know | Describe the difference between authorization and authentication. | Authentication verifies who you are (login); authorization verifies what you are allowed to do (permissions). |
 | Should know | Be capable of sending a POST request to a REST API using curl or Postman and populating the request body | `curl -X POST https://api.example.com/users -H "Content-Type: application/json" -d '{"name":"Alice"}'` |
-| Should know | Build a RESTful web service using a popular framework (e.g. Spring, Flask, Express) | `app.MapGet("/users", () => users); // ASP.NET Core Minimal API` |
+| Should know | Build a RESTful web service using a popular framework (e.g. ASP.NET Core Minimal API) | `app.MapGet("/users", () => users); // ASP.NET Core Minimal API` |
 | Nice to Have | Implement authentication and authorization using a popular RESTful framework (e.g. OAuth, JWT) | Issue a signed JWT on login and validate it on each request via middleware (e.g. `AddAuthentication().AddJwtBearer()`). |
 | Nice to Have | Compare and contrast RESTful and SOAP-based web services in terms of functionality, performance, and scalability | REST is lightweight (JSON over HTTP, cacheable, scalable); SOAP is heavier (XML, strict WSDL contracts, built-in standards) and suited to formal enterprise transactions. |
 
@@ -31,19 +30,10 @@
 | Must know | Analyze a given problem and determine the appropriate data structures and algorithms to use. | E.g. choose a hash table for fast lookups, a queue for FIFO processing, or binary search over sorted data. |
 | Must know | Read, interpret, and debug existing code that utilizes data structures and algorithms, identifying their efficiency and purpose. | Trace the code's loops and structures to determine its Big-O cost and intent (e.g. nested loops = O(n^2)). |
 | Must know | Demonstrate the ability to perform binary search on arrays or lists and be able to identify the syntax. | `int idx = Array.BinarySearch(sortedArr, target);` |
-| Must know | Explain the structure of tree and graph data structures | Tree: hierarchical nodes with one root and no cycles. Graph: vertices connected by edges, possibly cyclic and directed. |
-| Must know | Describe the difference between common sorting algorithms | Bubble/insertion/selection are O(n^2) simple sorts; merge and quick sort are O(n log n) divide-and-conquer. |
 | Should know | Explain when to choose a stack, queue, or priority queue based on program requirements. | Stack for undo/backtracking (LIFO), queue for ordered processing (FIFO), priority queue when items are served by priority. |
 | Should know | Evaluate the trade-offs between linear search and binary search in terms of time complexity and required data structure conditions. | Linear search is O(n) on any data; binary search is O(log n) but requires the data to be sorted. |
 | Should know | Compare and contrast arrays, linked lists, and hash tables based on time efficiency for insertion, deletion, and lookup operations. | Array: O(1) lookup, O(n) insert/delete. Linked list: O(1) insert/delete at a known node, O(n) lookup. Hash table: O(1) average for all three. |
-| Should know | Demonstrate the ability to perform bubble sort on arrays or lists and be able to identify the syntax. | `for (i...) for (j...) if (a[j] > a[j+1]) Swap(ref a[j], ref a[j+1]);` |
 | Should know | Be capable of explaining how to solve a given problem using the appropriate data structure and algorithm | E.g. detect duplicates by adding items to a `HashSet<T>` and checking the boolean returned by `Add`. |
-| Should know | Demonstrate the ability to perform insertion sort on arrays or lists and be able to identify the syntax. | Iterate from index 1, shifting larger sorted elements right until the current key lands in place. |
-| Should know | Demonstrate the ability to perform selection sort on arrays or lists and be able to identify the syntax. | Repeatedly find the minimum of the unsorted region and swap it into the next sorted position. |
-| Nice to Have | Demonstrate the ability to perform merge sort on arrays or lists and be able to identify the syntax. | Recursively split the array in half, sort each half, then merge the two sorted halves; O(n log n). |
-| Nice to Have | Explain the concept of recursion and identify the base case and recursive case in a method. | `int Fact(int n) => n == 0 ? 1 : n * Fact(n - 1); // base: n == 0` |
-| Nice to Have | Demonstrate how to solve simple problems using recursion | `int Sum(int n) => n == 0 ? 0 : n + Sum(n - 1);` |
-| Nice to Have | Demonstrate how to optimize algorithms using memoization and tabulation | Memoization caches recursive results (top-down); tabulation builds an answer table iteratively (bottom-up) to avoid recomputation. |
 
 ## EF Core
 
@@ -96,7 +86,6 @@
 | Must know | Describe the function of HTTP method annotations. | Attributes map an action to a verb and route: `[HttpGet("{id}")]`, `[HttpPost]`, `[HttpDelete("{id}")]`. |
 | Should know | Implement model binding effectively. | Bind values from route, query, body, and headers: `public IActionResult Get([FromRoute] int id, [FromQuery] int page)` |
 | Should know | Describe and implement data validation using annotations. | `[Required] public string Name { get; set; }` is checked automatically; `[ApiController]` returns 400 on `ModelState` failure. |
-| Should know | Demonstrate the use of automatic mapping for objects and DTOs. | Use a mapper instead of hand-written copies: `var dto = _mapper.Map<UserDto>(user); // AutoMapper` |
 | Should know | Implement native ASP.NET middleware, such as Logging or Identity. | Add built-in middleware in the pipeline: `app.UseAuthentication(); app.UseAuthorization();` |
 | Should know | Implement HTTP response codes effectively. | Return the result that matches the outcome: `return NotFound();`, `return CreatedAtAction(nameof(Get), new { id }, dto);` |
 | Nice to Have | Implements third party or custom filters and middleware. | `app.Use(async (ctx, next) => { /* pre */ await next(); /* post */ });` or a class implementing `IActionFilter`. |

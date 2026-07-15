@@ -63,25 +63,7 @@ for `30` — list every index each visits, then state each algorithm's Big-O and
 Linear visits indexes 0,1,2,3,4 -> found (O(n), no precondition). Binary visits mid=2 (14 < 30), mid=4
 (30 == 30) -> found in 2 probes (O(log n), **requires sorted data**).
 
-### Drill 5 — Identify the sort
-**Prompt:** Without labels, classify these three snippets as bubble / insertion / selection and give the
-tell for each:
-
-```csharp
-// A: for(i) { min=i; for(j>i) if(a[j]<a[min]) min=j; swap(a[i],a[min]); }
-// B: for(i) for(j < n-1-i) if(a[j]>a[j+1]) swap(a[j],a[j+1]);
-// C: for(i=1..n) { key=a[i]; while(j>=0 && a[j]>key) shift; a[j+1]=key; }
-```
-
-*Proves QC (Should):* the three "perform X sort ... identify the syntax" rows and *(Must)* "Describe the
-difference between common sorting algorithms."
-
-**Model solution** *(source: `demo/algorithms-threading-demo/DsaThreading/Sorts.cs`)*:
-A = **selection** (find min of unsorted region, swap into place). B = **bubble** (adjacent-pair swaps).
-C = **insertion** (sorted prefix, shift right, drop the key). All O(n^2); merge sort is the O(n log n)
-divide-and-conquer contrast.
-
-### Drill 6 — Choose the structure
+### Drill 5 — Choose the structure
 **Prompt:** For each requirement in your domain, name the data structure and justify with its operation
 costs: (a) detect duplicate identifiers while importing, (b) process work items strictly in arrival
 order, (c) undo the last action repeatedly, (d) always handle the most urgent item first.
@@ -94,31 +76,11 @@ Enqueue/Dequeue O(1); (c) `Stack<T>` — LIFO Push/Pop O(1); (d) `PriorityQueue<
 Enqueue/Dequeue O(log n), Peek O(1). The Library thread uses exactly this for expedited-first order
 fulfillment.
 
-### Drill 7 — Recursion + memoization (Nice)
-**Prompt:** Write a recursive method for a self-similar computation in your domain; label base and
-recursive case. Then add a `Dictionary` cache and explain what changes about the cost.
-*Proves QC (Nice):* the recursion and memoization/tabulation rows.
-
-**Model solution** *(source: `content/03-dsa/recursion-memoization.md`, answer key
-`demo/algorithms-threading-demo/` commit `02-dsa-complete` = `c70c979`)*:
-
-```csharp
-static readonly Dictionary<int, long> Memo = new();
-static long Fib(int n)
-{
-    if (n <= 1) return n;                       // base case
-    if (Memo.TryGetValue(n, out var hit)) return hit;
-    return Memo[n] = Fib(n - 1) + Fib(n - 2);   // recursive case, cached
-}
-```
-Uncached: O(2^n) calls. Memoized: each n computed once -> O(n). Tabulation builds the same table
-bottom-up in a loop.
-
 ---
 
 ## EF Core
 
-### Drill 8 — Model by convention, then annotate
+### Drill 6 — Model by convention, then annotate
 **Prompt:** Create an entity for your domain using conventions only (PK by name, string props), generate
 a migration, and apply it. Then add `[Required]` + `[MaxLength]` and a second migration. Inspect what
 each migration generated.
@@ -141,7 +103,7 @@ public class Customer
 dotnet ef migrations add OrdersCustomers && dotnet ef database update
 ```
 
-### Drill 9 — Fluent API where annotations can't reach
+### Drill 7 — Fluent API where annotations can't reach
 **Prompt:** Give one of your entities a unique index and a decimal column type via `OnModelCreating`,
 and say why annotations alone couldn't do it.
 *Proves QC (Should):* "Describe the role of the Fluent API and when it is required instead of Data
@@ -162,7 +124,7 @@ protected override void OnModelCreating(ModelBuilder b)
 Unique indexes, composite keys, and relationship fine-tuning have no annotation equivalent — Fluent API
 (highest precedence: convention < annotations < Fluent) is the only home.
 
-### Drill 10 — Narrate the change tracker
+### Drill 8 — Narrate the change tracker
 **Prompt:** Write three statements that add, modify, and delete entities, and for each, state the entity
 state before `SaveChanges()` and the SQL emitted by it.
 *Proves QC (Must):* "Explain how Entity Framework tracks changes in entities and persists them to the
@@ -181,7 +143,7 @@ db.SaveChanges();                   // one batch, in a transaction
 
 ## C# Multithreading
 
-### Drill 11 — Race, then fix
+### Drill 9 — Race, then fix
 **Prompt:** Create a shared counter and increment it 100,000 times from several parallel tasks without
 synchronization; print the result. Then fix it twice — once with `lock`, once with `Interlocked` — and
 explain when you'd pick each.
@@ -198,7 +160,7 @@ Parallel.For(0, 100_000, _ => Interlocked.Increment(ref bank.Balance)); // atomi
 ```
 `Interlocked` for a single atomic operation (cheapest); `lock` for multi-statement critical sections.
 
-### Drill 12 — Cooperative cancellation
+### Drill 10 — Cooperative cancellation
 **Prompt:** Start a long-running task in your domain that honors a `CancellationToken`; cancel it after
 two seconds and prove it stopped cleanly (no `Thread.Abort`-style kill).
 *Proves QC (Should):* cancellation/exception handling + cooperative-vs-preemptive rows.
@@ -219,7 +181,7 @@ try { await worker; }
 catch (OperationCanceledException) { Console.WriteLine("stopped cleanly"); }
 ```
 
-### Drill 13 — Thread vs ThreadPool vs Task
+### Drill 11 — Thread vs ThreadPool vs Task
 **Prompt:** Run the same unit of work three ways — dedicated `Thread`, `ThreadPool.QueueUserWorkItem`,
 and `Task.Run` — and state one reason to choose each.
 *Proves QC (Must):* Thread class, ThreadPool, and TPL rows.
@@ -237,7 +199,7 @@ await Task.Run(ScanShelves);                           // default: awaitable, co
 
 ## ASP.NET Core
 
-### Drill 14 — Full REST controller
+### Drill 12 — Full REST controller
 **Prompt:** Build a controller for one resource in your domain with GET-all, GET-by-key, POST, DELETE —
 returning 200/201 + Location/204/404 correctly and taking/returning DTOs (never entities).
 *Proves QC (Must):* controllers + action methods, DTOs, HTTP method annotations; *(Should)* effective
@@ -247,7 +209,7 @@ response codes.
 `GetBySku` (404 on miss), `Create` (`CreatedAtAction(nameof(GetBySku), new { sku = response.Sku },
 response)`), `Delete` (`NoContent()` / `NotFound()`); DTO mapping via `_mapper.Map<InventoryDto>(...)`.
 
-### Drill 15 — Short-circuit middleware
+### Drill 13 — Short-circuit middleware
 **Prompt:** Add an inline middleware that returns 503 when a special header is present, without calling
 the rest of the pipeline; place it so it still gets exception handling above it. Prove the short-circuit.
 *Proves QC (Should):* native middleware; *(Nice)* custom filters and middleware; *(Must)* the HTTP
@@ -271,7 +233,7 @@ app.Use(async (ctx, next) =>
 curl -H "X-Maintenance: 1" http://localhost:5137/api/inventory   # 503, no controller log line
 ```
 
-### Drill 16 — Validation to 400
+### Drill 14 — Validation to 400
 **Prompt:** Add `[Required]` and a range/length constraint to your create-DTO and prove that an invalid
 body yields an automatic 400 with the field errors — no `if` statements in the action.
 *Proves QC (Should):* "Describe and implement data validation using annotations." + model binding.
@@ -282,7 +244,7 @@ body yields an automatic 400 with the field errors — no `if` statements in the
 record gotcha: put plain annotations on record properties — `[property:]`-targeted attributes on
 positional records throw at runtime.
 
-### Drill 17 — Cache with write-through invalidation (Nice)
+### Drill 15 — Cache with write-through invalidation (Nice)
 **Prompt:** Cache your collection GET server-side with a 2-minute absolute expiry, and evict the entry
 in every write action. Prove eviction: GET, POST, GET — the second GET must show the new item.
 *Proves QC (Nice):* "Demonstrate understanding of caching in an API."

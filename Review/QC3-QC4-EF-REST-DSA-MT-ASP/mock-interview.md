@@ -40,14 +40,6 @@ for any logged-in user, `[Authorize(Roles = "admin")]` for writes.
 Proves QC: "Describe the difference between authorization and authentication."
 Source: `weeklytechrepo/EFCore-REST-SOAP/content/08-security/authentication-jwt.md`
 
-**[Should] Sketch an SOA for an order system.**
-Model answer: Loosely coupled services communicating over the network, each owning its data: a client
-talks to an API gateway, which fronts an auth service, an order service, and an inventory service; each
-service has its own store. Services scale and deploy independently and talk over HTTP contracts — our
-supplier-price endpoint consuming an external API is one arrow of exactly that diagram.
-Proves QC: "Describe SOA (Service Oriented Architecture) and be capable of diagramming the components of a sample system"
-Source: `weeklytechrepo/EFCore-REST-SOAP/content/02-rest-http/rest-principles.md`
-
 **[Nice] When would you pick SOAP over REST?**
 Model answer: SOAP when a formal machine-readable contract (WSDL), strict typing, and enterprise
 standards like WS-Security matter, or when integrating with legacy systems that already speak it — every
@@ -63,7 +55,7 @@ Source: `weeklytechrepo/EFCore-REST-SOAP/content/07-soap/soap-vs-rest.md`
 **[Must] What is Big-O, and what's the complexity of this nested loop?**
 Model answer: Big-O describes how work grows with input size in the worst case, dropping constants and
 lower-order terms — O(1), O(log n), O(n), O(n log n), O(n^2) is the ladder to know. A loop over n inside
-a loop over n is O(n^2); that is exactly the shape of bubble, insertion, and selection sort.
+a loop over n is O(n^2); a loop that halves its range each pass is O(log n).
 Proves QC: "Describe algorithm complexity using Big O notation and analyze the efficiency of an algorithm or data structure"
 Source: `weeklytechrepo/EFCore-REST-SOAP/content/03-dsa/big-o-complexity.md`
 
@@ -83,13 +75,6 @@ served by urgency instead of arrival, that's the priority queue's job at O(log n
 Proves QC: the list/stack/queue/hash-table ADT Must rows + the stack/queue/priority-queue Should row.
 Source: `weeklytechrepo/EFCore-REST-SOAP/content/03-dsa/collections-adts.md`
 
-**[Must] How do trees and graphs differ?**
-Model answer: A tree is hierarchical — one root, every node one parent, no cycles; file systems and org
-charts. A graph is the general case — vertices and edges, possibly directed, possibly cyclic; road
-networks and dependencies. Every tree is a graph; not every graph is a tree.
-Proves QC: "Explain the structure of tree and graph data structures"
-Source: `weeklytechrepo/EFCore-REST-SOAP/content/03-dsa/trees-graphs.md`
-
 **[Should] Arrays vs linked lists vs hash tables for insert, delete, lookup?**
 Model answer: Array: O(1) indexed lookup, O(n) insert/delete because elements shift. Linked list: O(1)
 insert/delete at a node you already hold, O(n) to find it. Hash table: O(1) average for all three, at
@@ -97,14 +82,6 @@ the cost of ordering and some memory. So: index-heavy reads -> array; splice-hea
 key lookups -> hash table.
 Proves QC: "Compare and contrast arrays, linked lists, and hash tables based on time efficiency for insertion, deletion, and lookup operations."
 Source: `weeklytechrepo/EFCore-REST-SOAP/content/03-dsa/collections-adts.md`
-
-**[Nice] What's the base case in this method, and why does memoization help?**
-Model answer: The base case is the branch that returns without recursing — `n == 0` in a factorial; the
-recursive case must shrink toward it or you overflow the stack. Memoization caches each result the first
-time it's computed, top-down, turning overlapping-subproblem recursions like Fibonacci from O(2^n) into
-O(n); tabulation gets the same effect bottom-up with a loop and a table.
-Proves QC: the recursion and memoization/tabulation Nice rows.
-Source: `weeklytechrepo/EFCore-REST-SOAP/content/03-dsa/recursion-memoization.md`
 
 ---
 
@@ -226,7 +203,7 @@ internal model. Returning entities leaks fields you didn't mean to publish and �
 properties — creates serialization cycles; our first attempt at returning the entity graph looped
 infinitely until the DTO fixed it. Mapping is mechanical, so AutoMapper does it:
 `_mapper.Map<InventoryDto>(item)` against a `MappingProfile`.
-Proves QC: "Demonstrate functional knowledge of Data Transfer Objects, and their use." + the AutoMapper Should row.
+Proves QC: "Demonstrate functional knowledge of Data Transfer Objects, and their use."
 Source: `weeklytechrepo/EFCore-REST-SOAP/content/06-aspnet-core/dtos-service-layer-automapper.md`, `demo/library-fulfillment/Library.ControllerApi/Controllers/InventoryController.cs`
 
 **[Must] What does "implement an API service" mean in this stack?**

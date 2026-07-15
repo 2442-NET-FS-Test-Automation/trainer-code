@@ -57,7 +57,6 @@ The inventory controller's URL surface is the conventions in miniature — one n
 **Objectives covered**
 - *(Must)* Be capable of sending a GET request to an open source REST API using curl or Postman
 - *(Should)* Be capable of sending a POST request to a REST API using curl or Postman and populating the request body
-- *(Should)* Describe SOA (Service Oriented Architecture) and be capable of diagramming the components of a sample system
 - *(Should)* Describe the difference between authorization and authentication.
 - *(Nice)* Implement authentication and authorization using a popular RESTful framework (e.g. OAuth, JWT)
 - *(Nice)* Compare and contrast RESTful and SOAP-based web services in terms of functionality, performance, and scalability
@@ -66,9 +65,7 @@ The inventory controller's URL surface is the conventions in miniature — one n
 `content/08-security/authentication-jwt.md`, `content/07-soap/soap-vs-rest.md`)*
 curl is the command-line HTTP client: bare `curl <url>` is a GET; `-X POST` picks the verb, `-H` adds
 headers, `-d` supplies the body (with `Content-Type: application/json` for JSON APIs). Postman is the
-same requests with a UI. **SOA** decomposes a system into loosely coupled services communicating over
-the network — client -> API gateway -> [auth service, order service, ...] -> per-service data stores —
-each independently deployable. **Authentication** establishes who you are (credentials -> in our stack a
+same requests with a UI. **Authentication** establishes who you are (credentials -> in our stack a
 signed **JWT**); **authorization** decides what you may do (roles/policies read from the token's
 claims). The JWT flow as taught: `POST /auth/login` verifies the hashed password and returns a signed
 token; the client sends `Authorization: Bearer <token>`; `AddJwtBearer` validates signature, issuer,
@@ -105,15 +102,13 @@ curl -H "Authorization: Bearer $ADMIN_TOKEN" \
 - *(Must)* Explain the list abstract data type and its common operations
 - *(Must)* Explain the stack and queue abstract data types and their common operations
 - *(Must)* Explain the hash table abstract data type and its common operations
-- *(Must)* Explain the structure of tree and graph data structures
 - *(Must)* Analyze a given problem and determine the appropriate data structures and algorithms to use.
 - *(Must)* Read, interpret, and debug existing code that utilizes data structures and algorithms, identifying their efficiency and purpose.
 - *(Should)* Explain when to choose a stack, queue, or priority queue based on program requirements.
 - *(Should)* Compare and contrast arrays, linked lists, and hash tables based on time efficiency for insertion, deletion, and lookup operations.
 - *(Should)* Be capable of explaining how to solve a given problem using the appropriate data structure and algorithm
 
-**Concept recap** *(sources: `content/03-dsa/big-o-complexity.md`, `content/03-dsa/collections-adts.md`,
-`content/03-dsa/trees-graphs.md`)*
+**Concept recap** *(sources: `content/03-dsa/big-o-complexity.md`, `content/03-dsa/collections-adts.md`)*
 **Big-O** describes worst-case growth of work versus input size, dropping constants and lower-order
 terms: O(1) constant, O(log n) halving, O(n) linear, O(n log n) efficient sorts, O(n^2) nested loops.
 Reading code for its Big-O is pattern spotting — one loop over n is O(n); a loop in a loop is O(n^2); a
@@ -124,8 +119,7 @@ process in arrival order); **priority queue** — serve by urgency, O(log n) enq
 (`PriorityQueue<TElement,TPriority>`); **hash table** — key-value with O(1) average add/remove/lookup
 (`Dictionary<K,V>`, membership via `HashSet<T>`). Cross-structure trade-offs: array O(1) indexed read
 but O(n) mid-insert (shifting); linked list O(1) splice at a known node but O(n) to find it; hash table
-O(1) average everything, unordered. **Trees** are hierarchical (one root, no cycles); **graphs**
-generalize (vertices + edges, possibly directed/cyclic).
+O(1) average everything, unordered.
 
 **Key points / pitfalls**
 - Say "average" for hash tables — worst case degrades with collisions. Interviewers listen for it.
@@ -148,37 +142,25 @@ var next = queue.Dequeue();                   // expedited jumps the line, O(log
 
 ---
 
-## 4. Searching & Sorting
+## 4. Searching
 
 **Objectives covered**
 - *(Must)* Demonstrate the ability to perform linear search on arrays or lists and be able to identify the syntax.
 - *(Must)* Demonstrate the ability to perform binary search on arrays or lists and be able to identify the syntax.
-- *(Must)* Describe the difference between common sorting algorithms
 - *(Should)* Evaluate the trade-offs between linear search and binary search in terms of time complexity and required data structure conditions.
-- *(Should)* Demonstrate the ability to perform bubble sort on arrays or lists and be able to identify the syntax.
-- *(Should)* Demonstrate the ability to perform insertion sort on arrays or lists and be able to identify the syntax.
-- *(Should)* Demonstrate the ability to perform selection sort on arrays or lists and be able to identify the syntax.
-- *(Nice)* Demonstrate the ability to perform merge sort on arrays or lists and be able to identify the syntax.
 
-**Concept recap** *(sources: `content/03-dsa/searching.md`, `content/03-dsa/sorting.md`)*
+**Concept recap** *(source: `content/03-dsa/searching.md`)*
 **Linear search** walks every element — O(n), works on anything. **Binary search** keeps `low`/`high`
 bounds, probes the midpoint, and discards the impossible half — O(log n), but **only on sorted data**;
 that precondition *is* the trade-off (sorting first costs O(n log n), so binary search pays off on
-repeated lookups, not one-offs). The three simple **O(n^2) sorts** differ by mechanism, and the exam
-tests recognizing each from raw code: **bubble** repeatedly swaps adjacent out-of-order pairs (largest
-"bubbles" to the end each pass); **insertion** grows a sorted prefix, shifting larger elements right
-until the current key drops into place; **selection** finds the minimum of the unsorted region and swaps
-it into the next position. **Merge sort** is the divide-and-conquer contrast: recursively split, sort
-halves, merge two sorted arrays — O(n log n). Library helpers exist (`Array.BinarySearch`,
-`Array.Sort`), but the hand-rolled shapes are what "identify the syntax" means.
+repeated lookups, not one-offs). A library helper exists (`Array.BinarySearch`), but the hand-rolled
+shape is what "identify the syntax" means.
 
 **Key points / pitfalls**
 - Binary search on unsorted data doesn't error — it confidently returns garbage. State the precondition
   unprompted.
 - `mid = low + (high - low) / 2` instead of `(low + high) / 2`: avoids integer overflow. Naming this is
   an easy depth signal.
-- Recognition tells: adjacent swap -> bubble; `while` shift loop -> insertion; min-of-remainder swap ->
-  selection; recursion + merge helper -> merge sort.
 - The live demo's original unbounded retry became a taught fix (`03a` rung): treat "loops that may never
   terminate" as part of reading/debugging algorithmic code.
 
@@ -202,36 +184,7 @@ public static int BinarySearch(int[] sorted, int target)
 
 ---
 
-## 5. Recursion & Memoization *(Nice tier — notes + answer key)*
-
-**Objectives covered**
-- *(Nice)* Explain the concept of recursion and identify the base case and recursive case in a method.
-- *(Nice)* Demonstrate how to solve simple problems using recursion
-- *(Nice)* Demonstrate how to optimize algorithms using memoization and tabulation
-
-**Concept recap** *(source: `content/03-dsa/recursion-memoization.md`)*
-A recursive method calls itself on a smaller input. The **base case** returns without recursing — it
-stops the descent; the **recursive case** must move toward it, or the stack overflows.
-`int Fact(int n) => n == 0 ? 1 : n * Fact(n - 1);` — base `n == 0`, recursive `n * Fact(n - 1)`. When
-subproblems overlap (Fibonacci), naive recursion recomputes exponentially; **memoization** caches each
-result top-down (check the dictionary before recursing), **tabulation** builds the same table bottom-up
-with a loop. Both trade O(n) memory for collapsing O(2^n) time to O(n). This material was
-notes-relegated (never live-demoed); the runnable reference is the `02-dsa-complete` answer-key commit.
-
-**Key points / pitfalls**
-- First question is always "where's the base case?" — point at it before explaining anything else.
-- Memoization pays only with *overlapping* subproblems; memoized factorial buys nothing (each n computed
-  once anyway).
-- Every recursion has an iterative equivalent; recursion buys clarity on self-similar structures (trees)
-  at the cost of stack frames.
-
-**Worked example** *(cited: `content/03-dsa/recursion-memoization.md`; answer key
-`demo/algorithms-threading-demo/` commit `02-dsa-complete` = `c70c979`)*
-See Drill 7 in `drills.md` — memoized Fibonacci with base case, recursive case, and cache labeled.
-
----
-
-## 6. EF Core: Models, DbContext & Change Tracking
+## 5. EF Core: Models, DbContext & Change Tracking
 
 **Objectives covered**
 - *(Must)* Create an EF Core model using EF Core code conventions.
@@ -276,7 +229,7 @@ public class LibraryDbContext : DbContext
 
 ---
 
-## 7. EF Core: Configuration, Migrations & Raw SQL
+## 6. EF Core: Configuration, Migrations & Raw SQL
 
 **Objectives covered**
 - *(Must)* Use Entity Framework to generate a SQL schema with a code-first approach.
@@ -332,7 +285,7 @@ protected override void OnModelCreating(ModelBuilder b)
 
 ---
 
-## 8. Threads, ThreadPool & the TPL
+## 7. Threads, ThreadPool & the TPL
 
 **Objectives covered**
 - *(Must)* Create and manage threads in a C# application using the Thread class.
@@ -381,7 +334,7 @@ var par = sw.ElapsedMilliseconds;                      // faster - but not by co
 
 ---
 
-## 9. Synchronization, Pitfalls & Cancellation
+## 8. Synchronization, Pitfalls & Cancellation
 
 **Objectives covered**
 - *(Must)* Explain synchronization techniques (e.g., lock, Monitor) and how they prevent race conditions.
@@ -446,7 +399,7 @@ public class Bank
 
 ---
 
-## 10. ASP.NET Core: Pipeline, Middleware & Filters
+## 9. ASP.NET Core: Pipeline, Middleware & Filters
 
 **Objectives covered**
 - *(Must, QC-4)* Describe the HTTP pipeline.
@@ -505,7 +458,7 @@ app.MapControllers();
 
 ---
 
-## 11. ASP.NET Core: Controllers, DTOs, Validation & Cross-Cutting
+## 10. ASP.NET Core: Controllers, DTOs, Validation & Cross-Cutting
 
 **Objectives covered**
 - *(Must, QC-4)* Implement controllers and action methods.
@@ -516,11 +469,10 @@ app.MapControllers();
 - *(Must, QC-4)* Describe the function of HTTP method annotations.
 - *(Should, QC-4)* Implement model binding effectively.
 - *(Should, QC-4)* Describe and implement data validation using annotations.
-- *(Should, QC-4)* Demonstrate the use of automatic mapping for objects and DTOs.
 - *(Should, QC-4)* Implement HTTP response codes effectively.
 - *(Nice, QC-4)* Demonstrate understanding of caching in an API.
 - *(Nice, QC-4)* Implement an API which consumes a 3rd party API.
-- *(Should, QC-3 REST)* Build a RESTful web service using a popular framework (e.g. Spring, Flask, Express)
+- *(Should, QC-3 REST)* Build a RESTful web service using a popular framework (e.g. ASP.NET Core Minimal API)
 
 **Concept recap** *(sources: `content/06-aspnet-core/controllers-actions.md`,
 `content/06-aspnet-core/dtos-service-layer-automapper.md`,

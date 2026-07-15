@@ -3,8 +3,11 @@
 Exam-prep material for the **combined QC-3 (EF Core, DSA, REST, C# Multithreading) + QC-4 (ASP.NET Core)
 sitting — one exam, Friday July 17, full AM block**. This package **synthesizes** content that was already
 taught — it does not introduce new topics. Every entry traces to a real source file (cited inline). It
-covers the union of both rubrics — **78 objectives** (63 QC-3 + 15 QC-4) across five sections: REST, DSA,
-EF Core, C# Multithreading, and ASP.NET Core.
+covers the union of both rubrics — **67 objectives** (53 QC-3 + 14 QC-4) across five sections: REST, DSA,
+EF Core, C# Multithreading, and ASP.NET Core. *(2026-07-15: 11 rows were cut from the rubrics after an
+adjudication against the actual portal curricula — SOA, the sorting/recursion/tree DSA set, and
+AutoMapper; see `docs/status/QC3-QC4-CUT-ADJUDICATION-2026-07-15.md`. This package was trimmed in place
+to match.)*
 
 The two rubrics remain separate canonical files (`qc-criteria/QC-3-EF-Core-REST-DSA-MT.md` and
 `qc-criteria/QC-4-ASP-NET-CORE.md`); the trainer's merged exam paper
@@ -60,6 +63,6 @@ Source roots used throughout:
 
 All **Must-know and Should-know** objectives of both rubrics were taught by end of Week 5 (QC-3
 Must/Should by end of Week 4; QC-4 by end of Week 5). Three Nice-to-have items carry user-signed demo
-waivers and are covered in the written notes only; the REST-vs-SOAP comparison is note-covered with its
-demo (`08-soap`) scheduled Tuesday July 14, before the sitting. See `out-of-scope-register.md` for the
-detail. There are **no coverage defects**.
+waivers and are covered in the written notes only; the REST-vs-SOAP comparison is note-covered (its
+`08-soap` demo slot is floating). See `out-of-scope-register.md` for the detail. There are **no
+coverage defects**.

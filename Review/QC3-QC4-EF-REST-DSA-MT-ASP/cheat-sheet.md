@@ -49,10 +49,6 @@ curl -X POST http://localhost:5137/api/inventory \
 (login -> 401 when missing/invalid); authorization = what you may do (role/policy -> 403 when
 insufficient). Pipeline order: `UseAuthentication()` **before** `UseAuthorization()`.
 
-**SOA sketch** *(source: `content/02-rest-http/rest-principles.md`)*:
-`Client -> API Gateway -> [Auth Service | Order Service | Inventory Service] -> each service's own DB`
-— loosely coupled services over a network, each independently deployable.
-
 **REST vs SOAP** *(source: `content/07-soap/soap-vs-rest.md`)*
 
 | | REST | SOAP |
@@ -100,22 +96,6 @@ for (int i = 0; i < data.Length; i++)          // linear
 int mid = low + (high - low) / 2;              // binary midpoint (overflow-safe)
 if (sorted[mid] < target) low = mid + 1; else high = mid - 1;
 ```
-
-**Sorts** *(source: `content/03-dsa/sorting.md`, `demo/algorithms-threading-demo/DsaThreading/Sorts.cs`)*
-
-| Sort | Cost | Recognize by |
-|---|---|---|
-| Bubble | O(n^2) | nested loops, swap **adjacent** pairs `a[j] > a[j+1]` |
-| Insertion | O(n^2) | grow sorted prefix; `while` shifting larger items right |
-| Selection | O(n^2) | find **min** of unsorted region, swap into place |
-| Merge (Nice) | O(n log n) | recursion: split halves, then merge two sorted arrays |
-
-**Recursion** *(source: `content/03-dsa/recursion-memoization.md`)*: base case stops, recursive case
-shrinks toward it — `int Fact(int n) => n == 0 ? 1 : n * Fact(n - 1);`. Memoization = cache results
-top-down (`Dictionary<int,long>` before recursing); tabulation = build the table bottom-up iteratively.
-
-**Trees/graphs** *(source: `content/03-dsa/trees-graphs.md`)*: tree = hierarchical, one root, no cycles;
-graph = vertices + edges, may be cyclic/directed.
 
 ---
 
