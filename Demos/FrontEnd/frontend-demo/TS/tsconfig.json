@@ -1,0 +1,28 @@
+{   
+    // tsc read this file when we run commands like npx tsc
+    "compilerOptions": { 
+
+        // Target - which version of JS to emit - we will use es2020
+        "target": "es2025",
+        //lib - lets us set a default library of functions available to us
+        "lib": ["ES2025"],
+        // Modules  - how imports are emitted and resolved. nodenext = real ES modules
+        // resolved by Node
+        "module": "nodenext",
+        // who's global types do we get? We will use Node's. Things like console for console.log
+        "types":["node"],
+        // Strict - this is like 90% of the reason why TS is even worth using. Turns on strickNullChecks,
+        // noImplicitAny and some other options all in one. Default in React and Angular.
+        "strict": true,
+        // We can tell the Tsc to skip type checking inside node_modules - most of that is probably JS
+        // anyways. 
+        "skipLibCheck": true,
+        // a broken build doesn't override the last working output
+        "noEmitOnError": true,
+        // sources for our TS in the current directory, outputs into dist/
+        "rootDir": ".",
+        "outDir": "dist"
+    },
+    // only compile stuff inside the TS folder and it's subdirectories 
+    "include": ["./**/*"]
+}
