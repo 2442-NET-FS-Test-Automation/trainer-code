@@ -4,7 +4,10 @@
 
 // Notice we import from a .js file - that's the runtime path
 // because what actually runs is /dist/demo.js
-import { InventoryItem, HttpStatus, SortDirection } from "./types.js";
+import { InventoryItem, HttpStatus, SortDirection, SupplierPrice,
+    FetchState, Sku
+ } from "./types.js";
+import { ApiClient } from "./ts-client.js";
 
 // For now, lets create what our API will hand back to us
 const catalog: InventoryItem[] = [
@@ -28,3 +31,10 @@ printCatalog(catalog); //calling our function
 // In TS numeric enums actually map both ways
 console.log(HttpStatus.Unauthorized); // 401
 console.log(HttpStatus[401]); // Unauthorized
+
+// Lets use our client
+const api = new ApiClient();
+
+
+const liveCatalog = await api.getJson("/api/Inventory");
+console.log(liveCatalog);
