@@ -7,6 +7,43 @@ export interface ApiError {
     message: string;
 }
 
+// This is an example of a type guard. The compiler knows about our types - the runtime doesn't
+// This can let us have the runtime meaningfully check type for our generic functions.
+// This is a scary looking example of what they look like in prod often
+// export function isApiError(value: unknown): value is ApiError{
+//     return typeof value === "object" && value !== null //scary looking If statement 
+//         && "status" in value && "message" in value
+// }
+
+// Unknown forces us to type check before we can use whatever is in value
+// "value is ApiError" - an example of a Type Predicate. It instructs the compiler 
+// that if this function returns a "true" - the value that was passed in should 
+// now be treated as an ApiError
+export function isApiError(value: unknown): value is ApiError 
+{   
+    // 1. Primitives (strings, numbers, booleans) cannot be an ApiError - they aren't "objects"
+    if(typeof value !== "object")
+        return false;
+
+    // 2. This will run as JS - JS evaluates "typeof null" to "object". We must exclude nulls explicitly
+    if (value === null)
+        return false;
+
+    // 3. The object passed in MUST contain a 'status' property
+    if(!("status" in value))
+        return false;
+
+    // 4. The object MUST contain a 'message' property
+    if (!("message" in value))
+        return false;
+
+    // If all 4 constraints are satisfied (we pass to this point) - the compiler
+    // is safe to treat whatever object who's reference we passed in as an ApiError
+    return true;
+}
+
+
+
 
 export class ApiClient {
 
@@ -35,7 +72,9 @@ export class ApiClient {
             // Whatever object I got back from the API BETTER MATCH the shape of InventoryItem
             return await res.json() as T; 
 
-        } catch {
+        } catch (err) {
+            // Is err of type Error? If it is log its message. Otherwise - idk how did that. 
+            console.log(err instanceof Error ? err.message : "unknown error?");
             return { status: 0, message:"Cannot reach the API. Check if it's on, or CORS"};
         }
 

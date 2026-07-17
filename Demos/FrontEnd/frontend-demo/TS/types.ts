@@ -48,3 +48,13 @@ export enum SortDirection {
     Descending = "desc"
 }
 
+// Utility types - we can derive types from existing types 
+// saves you time typing
+
+// Partial<T>: just makes every field optional
+export type InventoryPatch = Partial<InventoryItem>; 
+
+// Omit<T, K>: Take a type and shave off a property. In our case the server assigns a sku
+// so we don't need to send it
+export type NewInventoryItem = Omit<InventoryItem, "sku">;
+
