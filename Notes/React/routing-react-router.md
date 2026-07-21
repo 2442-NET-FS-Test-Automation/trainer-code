@@ -1,12 +1,14 @@
 # Client-Side Routing with React Router
 
 ## Learning Objectives
+
 - Explain how a single-page application routes in the browser without full-page reloads.
 - Wire up React Router with `BrowserRouter`, `Routes`, `Route`, and navigate with `Link`.
 - Read URL parameters with `useParams` and navigate programmatically with `useNavigate`.
 - Compose nested routes that render children through an `Outlet` shared layout.
 
 ## Why This Matters
+
 A single-page application loads one HTML shell and then swaps views in the browser. Without a router, that means
 one giant component with a pile of conditionals; with React Router it means clean, bookmarkable URLs that map to
 components, a working back button, and shareable deep links. "How does routing work in an SPA" and "how do you
@@ -16,16 +18,18 @@ Router is the de facto standard, so it is worth knowing its core pieces cold.
 ## The Concept
 
 ### SPA routing vs multi-page navigation
+
 In a traditional multi-page app, every link asks the server for a whole new HTML document and the browser
 repaints from scratch. An SPA loads once, then **JavaScript intercepts navigation**, updates the URL with the
 History API, and re-renders the matching view in place — no round trip, no flash. React Router is the library
 that maps URL paths to components and keeps the URL and the UI in sync. Install it as a normal dependency:
 
-```
+```bash
 npm install react-router-dom
 ```
 
 ### BrowserRouter, Routes, and Route
+
 Wrap your app once in `BrowserRouter`. Inside it, declare a `Routes` block containing one `Route` per URL path;
 each `Route` names a `path` and the `element` to render when the URL matches.
 
@@ -50,6 +54,7 @@ function App() {
 element whose path matches the current URL is rendered; the rest are not.
 
 ### Navigating with Link
+
 Never use a plain `<a href>` for in-app navigation — that triggers a full page reload and throws away your app's
 state. Use `Link` (or `NavLink`, which adds an active style), which changes the URL and lets the router swap the
 view client-side.
@@ -75,6 +80,7 @@ function Nav() {
 ```
 
 ### Route parameters with useParams
+
 A dynamic segment in the path is written with a colon: `path="/books/:id"`. Inside the rendered component, read
 that segment with the `useParams` hook. The value is always a string, so parse it if you need a number.
 
@@ -101,6 +107,7 @@ Now `/books/42` and `/books/7` render the same component with different data —
 book.
 
 ### Programmatic navigation with useNavigate
+
 Sometimes you navigate in response to logic rather than a click on a link — after a form submits, say. The
 `useNavigate` hook returns a function you call with a path.
 
@@ -122,6 +129,7 @@ function AddBook() {
 ```
 
 ### Nested routes and Outlet
+
 When several views share a layout — a sidebar, a header, a tab strip — nest their routes under a parent and let
 the parent render an `Outlet` where the matched child should appear. The parent's chrome stays mounted while only
 the inner view changes.
@@ -160,11 +168,13 @@ Child paths are **relative** to the parent, and the `index` route is what shows 
 (`/books`). This is how you model real UI architecture: shared layout once, swappable content inside.
 
 ### A note on route guards
+
 Restricting a route based on whether the user is authenticated — redirecting an unauthenticated visitor to a
 login page, for example — is called a *route guard* or protected route. That pattern is covered separately; this
 note stays on the navigation mechanics themselves.
 
 ### The data-router alternative
+
 Newer React Router also offers `createBrowserRouter` with a route array and a `RouterProvider`, which unlocks
 data loading and actions per route. The routing concepts are identical — the same paths, params, and outlets —
 just declared as objects instead of JSX.
@@ -189,6 +199,7 @@ function App() {
 ```
 
 ## Say It in an Interview
+
 - *"An SPA loads one shell and swaps views client-side. React Router maps URL paths to components: wrap the app
   in BrowserRouter, declare Routes with a Route per path, and navigate with Link instead of an anchor so there is
   no full reload."*
@@ -198,6 +209,7 @@ function App() {
   route is the default child at the parent's path."*
 
 ## Check Yourself
+
 1. What is the difference between how an SPA and a multi-page app handle a navigation click?
 2. Why use `Link` instead of `<a href>` for in-app navigation?
 3. Given `path="/books/:id"`, how do you read the id inside the component, and what type is it?
@@ -213,6 +225,7 @@ matched child route renders inside the parent layout; the `index` route is the d
 parent's own path.
 
 ## Summary
+
 - An SPA swaps views client-side; React Router maps URL paths to components and keeps URL and UI in sync.
 - Wrap once in `BrowserRouter`, declare a `Route` per `path` inside `Routes`, and navigate with `Link`/`NavLink`
   (never a plain anchor for in-app links).
@@ -221,6 +234,7 @@ parent's own path.
   Route guards for auth are covered separately.
 
 ## Resources
+
 - [React Router — Route (reactrouter.com)](https://reactrouter.com/en/main/route/route)
 - [React Router — useParams (reactrouter.com)](https://reactrouter.com/en/main/hooks/use-params)
 - [React Router — Nested Routes tutorial (reactrouter.com)](https://reactrouter.com/en/main/start/tutorial)

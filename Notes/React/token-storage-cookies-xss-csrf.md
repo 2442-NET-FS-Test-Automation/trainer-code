@@ -1,6 +1,7 @@
 # Token Storage in Depth: Cookies, HttpOnly, XSS, and CSRF
 
 ## Learning Objectives
+
 - Explain what a cookie actually is — the `Set-Cookie` header, the attributes (`HttpOnly`, `Secure`,
   `SameSite`, `Max-Age`), and the browser's auto-attach behavior.
 - Define XSS and CSRF precisely, name which storage choice is exposed to which, and why.
@@ -12,6 +13,7 @@
   require, on both ends.
 
 ## Why This Matters
+
 "Where do you store the JWT?" is one of the most reliable interview questions in front-end and
 full-stack loops, and it is a trap for anyone who memorized a one-liner. "localStorage is insecure,
 use cookies" fails the follow-up ("so cookies are safe?") just as fast as the reverse. The honest
@@ -25,9 +27,10 @@ chain.
 ## The Concept
 
 ### (a) What a cookie actually is
+
 A cookie is a small piece of state the **server** asks the browser to keep, via a response header:
 
-```
+```csharp
 Set-Cookie: library.auth=eyJhbGciOi...; HttpOnly; Secure; SameSite=Lax; Max-Age=3600; Path=/
 ```
 
@@ -56,6 +59,7 @@ calling an API on `localhost:5137` is *cross-origin* (CORS applies) but **same-s
 cookies still flow). Those are two different walls, enforced at two different layers.
 
 ### (b) XSS: the attack `localStorage` is exposed to
+
 **Cross-Site Scripting** means an attacker gets *their* JavaScript to run in *your* page — through an
 unescaped comment field, a compromised npm dependency, an injected ad script. Once any hostile script
 runs in the page, it runs with the page's privileges, and `localStorage` is part of those privileges:
@@ -69,6 +73,7 @@ One line, and the attacker now holds a valid bearer token they can replay from a
 expires. That is the exposure the demo names when it picks `localStorage`.
 
 Defenses are about keeping hostile script out in the first place:
+
 - **Escape output** — the framework's job, and React does it by default: `{userInput}` in JSX is
   rendered as text, not parsed as HTML. The escape hatch is literally named
   `dangerouslySetInnerHTML`; every use of it (and every direct `innerHTML` write in plain JS) is an
@@ -80,6 +85,7 @@ Defenses are about keeping hostile script out in the first place:
   user's session.
 
 ### (c) HttpOnly stops theft — not misuse
+
 Move the token into an `HttpOnly` cookie and the one-liner above returns nothing: JavaScript cannot
 read the cookie, so the token cannot be *exfiltrated*. This is the real security win, and it is worth
 having.
@@ -93,6 +99,7 @@ does not make XSS survivable. Nothing does — if hostile script runs in the pag
 Storage choice decides what the attacker walks away with.
 
 ### (d) CSRF: the attack cookies are exposed to
+
 **Cross-Site Request Forgery** is the mirror image, and it exists *because of* cookie auto-attach.
 The attacker never runs script in your page and never sees the token. They simply get a logged-in
 victim to visit `evil.example`, which contains:
@@ -113,6 +120,7 @@ page cannot read another origin's `localStorage` and cannot make your intercepto
 no CSRF. Each storage choice is immune to exactly the attack the other is exposed to.
 
 Cookie-side CSRF defenses, in the order you reach for them:
+
 - **`SameSite=Lax` or `Strict`** — the browser refuses to attach the cookie to cross-site `POST`s.
   `Lax` is the default in modern browsers and kills the classic auto-submitted-form attack outright.
 - **Anti-forgery tokens** (a.k.a. CSRF tokens) — the server hands the page a secret the attacker's
@@ -129,7 +137,7 @@ Cookie-side CSRF defenses, in the order you reach for them:
 ### (e) The trade-off, stated fully
 
 | | `localStorage` + Bearer header | HttpOnly cookie |
-|---|---|---|
+| --- | --- | --- |
 | XSS: token theft | **Exposed** — one line exfiltrates it | **Immune** — JS cannot read it |
 | XSS: on-session misuse | Exposed (attacker script can call the API) | Exposed (cookie auto-attaches) — theft blocked, misuse not |
 | CSRF | **Immune** — nothing auto-attaches | **Exposed** — needs `SameSite` + anti-forgery |
@@ -149,6 +157,7 @@ sidestep the whole question with a **Backend-for-Frontend (BFF)**: the browser h
 cookie to its own backend, and the JWT never enters the browser at all.
 
 ### (f) What switching our stack would actually take
+
 Concretely, on our Week 6 API (`Library.ControllerApi`) and the Week 7 SPA — this is ASP.NET Core
 territory, included here so the whole picture is in one place.
 
@@ -219,6 +228,7 @@ Count the moving parts: that is why "just use an HttpOnly cookie" is a bigger se
 sounds, and why the decision belongs at the start of a project rather than mid-sprint.
 
 ## Say It in an Interview
+
 - *"It's a trade, not a right answer. `localStorage` is readable by any script on the page, so XSS
   can steal the token — but nothing auto-attaches it, so CSRF is moot. An HttpOnly cookie is
   unreadable by JavaScript, so theft is off the table — but the browser auto-attaches it, so CSRF
@@ -236,6 +246,7 @@ sounds, and why the decision belongs at the start of a project rather than mid-s
   putting the token in the browser at all."*
 
 ## Check Yourself
+
 1. What does the `HttpOnly` attribute do, and what attack does it neutralize? What attack does it
    *not* neutralize, even against XSS?
 2. Why is a token in `localStorage` immune to CSRF?
@@ -268,6 +279,7 @@ user's cookie — CSRF as a config option. The spec forbids it and ASP.NET enfor
 startup, forcing an explicit origin list.
 
 ## Summary
+
 - A cookie is server-set state the browser attaches automatically; `HttpOnly`, `Secure`, and
   `SameSite` are the attributes that make it a defensible token home.
 - XSS = hostile script in your page; it can read `localStorage` in one line. React's default JSX
@@ -284,6 +296,7 @@ startup, forcing an explicit origin list.
   decode, `/auth/me` rehydration, and a "restoring" state on the client.
 
 ## Resources
+
 - [Using HTTP cookies — MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
 - [Cross-Site Scripting Prevention Cheat Sheet — OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
 - [Cross-Site Request Forgery Prevention Cheat Sheet — OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)

@@ -1,12 +1,14 @@
 # Fetching Data with Axios and Fetch
 
 ## Learning Objectives
+
 - Make HTTP requests from React with Axios and with the native Fetch API, and read the response.
 - Add an NPM library (Axios) to a React project and configure a reusable client instance.
 - Model the loading / error / data states of a request and render each conditionally.
 - Attach an `Authorization: Bearer` token in one place using an Axios request interceptor.
 
 ## Why This Matters
+
 A front end is only as useful as the data it shows, and that data comes over HTTP. Interviewers expect you to
 make a request, handle both success and failure, and reflect the in-flight state in the UI — the "spinner, then
 data or error" pattern users take for granted. Doing this in a scattered, ad hoc way leads to duplicated base
@@ -16,6 +18,7 @@ with an interceptor fixes all three, and it is the seam every authenticated app 
 ## The Concept
 
 ### Fetch: the built-in baseline
+
 `fetch` ships with the browser — no install needed. It returns a promise of a `Response`; you call `.json()`
 (itself async) to get the body. Two gotchas: `fetch` only rejects on **network** failure, not on HTTP error
 statuses, so you must check `res.ok` yourself; and you assemble URLs and headers by hand.
@@ -31,6 +34,7 @@ async function loadBooks(): Promise<Book[]> {
 ```
 
 ### Adding Axios as an NPM library
+
 Axios is a small HTTP client you add to the project like any dependency. This is the everyday act of leveraging
 an NPM library: install it, then import it where needed.
 
@@ -47,6 +51,7 @@ Axios improves on `fetch` in three ways that matter here: it **parses JSON autom
 **configured instance** plus **interceptors** so you set base URL and auth once.
 
 ### A reusable Axios instance
+
 Rather than typing the base URL and headers on every call, create one configured client and import it everywhere.
 
 ```tsx
@@ -74,6 +79,7 @@ const newBook = created.data;
 ```
 
 ### The request interceptor: attach the token in one place
+
 An **interceptor** is a function that runs on every request (or response) passing through the instance. The
 canonical use is authentication: read the stored token and set the `Authorization: Bearer` header on outgoing
 requests, so no individual call has to remember it. This interceptor is the single seam where auth attaches to
@@ -95,6 +101,7 @@ does the rest; log out by clearing the token and the header simply stops appeari
 matching seam for handling a global `401` (for example, redirecting to login).
 
 ### The loading / error / data pattern
+
 A request has three visible states: in flight, failed, and succeeded. Model each with state and render
 conditionally. Kick the request off in an effect so it runs when the component mounts.
 
@@ -145,6 +152,7 @@ failure, and set loading false in `finally` so it clears on both paths. The `act
 on an unmounted component" warning if the user navigates away before the response lands.
 
 ### Typed error handling with Axios
+
 Because Axios rejects on HTTP errors, `catch` receives an error you can narrow. Use `axios.isAxiosError` to read
 the status and server message safely.
 
@@ -167,6 +175,7 @@ try {
 ```
 
 ## Say It in an Interview
+
 - *"I create one configured Axios instance with `axios.create({ baseURL })` and import it everywhere, so the base
   URL lives in one place. Axios parses JSON onto `res.data` and rejects on HTTP errors, unlike fetch which only
   rejects on network failure and needs a manual `res.ok` check."*
@@ -176,6 +185,7 @@ try {
   loading, the error message on failure, the data on success, clearing loading in `finally`."*
 
 ## Check Yourself
+
 1. Name two behaviors of Axios that differ from `fetch` when a server returns a 500.
 2. What does `axios.create` give you over calling `axios.get` directly each time?
 3. Where does a request interceptor run, and what is the standard thing to do in it for authentication?
@@ -187,12 +197,13 @@ try {
 `res.data` automatically; `fetch` resolves normally on a 500 (you must check `res.ok`) and needs an explicit
 `.json()` call. (2) A reusable instance with a shared `baseURL`, default headers, and interceptors, so
 configuration lives in one place instead of on every call. (3) On every outgoing request through the instance;
-read the stored token and set `config.headers.Authorization = \`Bearer ${token}\``, then return `config`. (4)
-Loading, error, and data (success); clear the loading flag in the `finally` block. (5) So a response that arrives
+read the stored token and set `config.headers.Authorization = \`Bearer ${token}\``, then return`config`. (4)
+Loading, error, and data (success); clear the loading flag in the`finally` block. (5) So a response that arrives
 after the component unmounted (or after a newer request) does not call `setState` on an unmounted component or
 overwrite fresh data.
 
 ## Summary
+
 - Fetch is built in but only rejects on network failure (check `res.ok`) and needs manual `.json()`; Axios
   (`npm install axios`) parses JSON to `res.data` and rejects on HTTP error statuses.
 - Create one instance with `axios.create({ baseURL })` and import it everywhere so configuration lives in one
@@ -203,6 +214,7 @@ overwrite fresh data.
   against setting state after unmount.
 
 ## Resources
+
 - [Axios — Creating an instance & interceptors (axios-http.com)](https://axios-http.com/docs/instance)
 - [Using the Fetch API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 - [Synchronizing with Effects (react.dev)](https://react.dev/learn/synchronizing-with-effects)

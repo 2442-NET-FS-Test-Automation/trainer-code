@@ -1,6 +1,7 @@
 # Functional Components, JSX, and Your First Vite App
 
 ## Learning Objectives
+
 - Describe and write a functional component: a function that returns UI.
 - Read and write JSX, and explain how it integrates with plain JavaScript expressions.
 - Compose small components into nested trees that model a real interface.
@@ -8,6 +9,7 @@
 - Scaffold and run a React project from scratch with the Vite CLI.
 
 ## Why This Matters
+
 Every React interface you will ever build is a tree of functions that return markup. Once you internalize
 that a component is *just a function* and JSX is *just JavaScript with a nicer face*, the whole library
 stops feeling magical. Interviewers lean on this hard: "what is a functional component," "what actually is
@@ -19,6 +21,7 @@ stands on.
 ## The Concept
 
 ### A functional component is a function that returns UI
+
 A functional component is a JavaScript function that returns a React element (JSX). Two rules make it a
 component rather than an ordinary function: its name is **capitalized** (React treats lowercase tags as raw
 HTML and capitalized tags as components), and it returns something renderable — JSX, a string, a number, or
@@ -43,6 +46,7 @@ There is no class, no `render` method, no boilerplate. Components accept an inpu
 out.
 
 ### JSX is JavaScript in disguise
+
 JSX looks like HTML sitting inside your code, but it is not HTML and it is not a string. It is syntax sugar
 that a compiler rewrites into ordinary function calls. This:
 
@@ -76,6 +80,7 @@ function BookHeader() {
 ```
 
 ### Embedding JavaScript with curly braces
+
 The reason JSX is powerful is the escape hatch: any place you want a JavaScript **expression**, you open a
 pair of curly braces `{ }` and write it. Variables, function calls, arithmetic, ternaries, `.map()` — all
 of it.
@@ -102,6 +107,7 @@ the value in a plain variable *above* the `return` and drop the variable into th
 logic above, interpolate the result below" pattern is the everyday rhythm of writing components.
 
 ### Nested component structures model the UI as a tree
+
 Real interfaces are not one giant component. You build small, single-purpose components and compose them,
 exactly the way you compose functions. The result is a tree, and reading the JSX reads like an outline of
 the page.
@@ -138,6 +144,7 @@ skill in React: break a screen into the smallest reusable pieces, then assemble 
 easier to name, test, reuse, and reason about than one 400-line function.
 
 ### Three ways to style a component
+
 You will meet all three in production codebases; each has a place.
 
 **1. Inline styles** — a JavaScript object passed to the `style` prop. Property names are camelCase and
@@ -190,10 +197,11 @@ There is no single "right" choice — inline for tiny dynamic bits, Modules for 
 global stylesheets for app-wide resets and design tokens.
 
 ### Create and run a React app with the Vite CLI
+
 Vite is the standard modern tool for scaffolding and serving a React app: near-instant dev startup and hot
 reloading. Three commands take you from an empty folder to a running app in the browser.
 
-```
+```bash
 npm create vite@latest my-app -- --template react
 cd my-app
 npm install
@@ -215,6 +223,7 @@ the template gives you is `src/main.tsx` (which mounts your app into the page) a
 component you start editing).
 
 ## Say It in an Interview
+
 - *"A functional component is just a capitalized function that returns JSX. Props go in, UI comes out —
   there is no class or render method involved."*
 - *"JSX isn't HTML and isn't a string; it's syntax sugar that compiles to React.createElement calls. That's
@@ -225,6 +234,7 @@ component you start editing).
   — Vite gives me an instant dev server with hot reloading."*
 
 ## Check Yourself
+
 1. What two things make a function a React component rather than an ordinary function?
 2. JSX `<h1 className="x">Hi</h1>` compiles to what underlying JavaScript call?
 3. Why can you write a ternary inside `{ }` in JSX but not an `if` statement?
@@ -241,6 +251,7 @@ or compute the value above the return. (4) Inline styles (one-off dynamic values
 npm's arguments from the flags passed through to the Vite scaffolder so `--template react` reaches Vite.
 
 ## Summary
+
 - A functional component is a capitalized function that returns JSX; props in, UI out.
 - JSX is not HTML — it compiles to `React.createElement` calls, which is why attributes are camelCase and
   every tag closes.
@@ -251,6 +262,7 @@ npm's arguments from the flags passed through to the Vite scaffolder so `--templ
   `npm run dev`.
 
 ## Resources
+
 - [Your First Component — react.dev](https://react.dev/learn/your-first-component)
 - [Writing Markup with JSX — react.dev](https://react.dev/learn/writing-markup-with-jsx)
 - [Scaffolding Your First Vite Project — vitejs.dev](https://vitejs.dev/guide/#scaffolding-your-first-vite-project)

@@ -1,6 +1,7 @@
 # The Client-Side Auth Arc: Login, Token, Guarded Routes, End to End
 
 ## Learning Objectives
+
 - Trace the full arc: a controlled login form posts credentials, the API returns a JWT, and the client
   shapes the UI around it.
 - Weigh where to keep the token — `localStorage` vs an HttpOnly cookie — and state the XSS/CSRF trade-off
@@ -12,6 +13,7 @@
 - Explain why the `Authorization` header triggers a CORS preflight the server must allow.
 
 ## Why This Matters
+
 "Auth" on the front end is not one feature — it is an arc of small decisions that only work if they line up:
 how you collect credentials, where you put the token, how you attach it, how you decide what to show, and
 how you keep unauthenticated users out of protected screens. Each link has a wrong answer that looks fine in
@@ -23,6 +25,7 @@ Router, Axios — to cooperate around a single source of truth.
 ## The Concept
 
 ### (a) The login form: controlled input in, JWT out
+
 Start with a controlled form (state owns the fields) that posts credentials and receives a token. The
 server checks the password and, on success, returns a signed JWT — a compact string of three dot-separated
 base64url segments: header, payload (the claims), and signature.
@@ -64,6 +67,7 @@ export function LoginForm({ onToken }: { onToken: (token: string) => void }) {
 ```
 
 ### (b) Where to keep the token: `localStorage` vs HttpOnly cookie
+
 Once you hold a JWT you must store it somewhere so a refresh does not log the user out. There are two real
 options, and the trade-off is a genuine one — say it honestly rather than pretending one is strictly safe.
 
@@ -83,6 +87,7 @@ what a cookie switch costs on both ends of our stack — is its own note:
 [token-storage-cookies-xss-csrf.md](token-storage-cookies-xss-csrf.md).
 
 ### (c) Attach the token once: a single Axios request interceptor
+
 Do **not** hand-write an `Authorization` header at each call site — you will miss one. Register a single
 Axios **request interceptor** that runs before every request and adds the header if a token exists. One
 place to change, impossible to forget.
@@ -105,6 +110,7 @@ Every `api.get`/`api.post` now carries `Authorization: Bearer <token>` automatic
 cookie you would skip this entirely and set `withCredentials: true` so the browser sends the cookie.)
 
 ### (d) Decode, do not verify: reading claims client-side to shape UI
+
 To show a name or hide an admin button you need the claims *inside* the token. The client can **decode** the
 payload — but it can never **verify** it. Verification requires the server's secret; the client does not
 have it and must not. So the client base64url-decodes the middle segment purely to shape the UI, and treats
@@ -151,6 +157,7 @@ they touch a protected endpoint, because the signature no longer matches. Never 
 browser.
 
 ### (e) Auth as a state machine: Context + useReducer
+
 Auth has more than two states. Anonymous, authenticating (request in flight), authenticated, and error are
 four distinct conditions the UI must render differently. A reducer centralizes the transitions; Context
 distributes the result to the whole tree so any component can read it without prop-drilling.
@@ -234,6 +241,7 @@ Now `status === "authenticating"` disables the login button, `"error"` shows the
 `"authenticated"` unlocks the app — all from one source of truth.
 
 ### (f) Role-gated UI and role-gated routes
+
 Two levels of gating, and you need both. **UI gating** hides controls the user cannot use — a courtesy and a
 declutter, not a security boundary. **Route gating** (the route guard) redirects unauthenticated users away
 from protected screens entirely.
@@ -313,6 +321,7 @@ unauthenticated user a screen full of failed requests. `replace` swaps the histo
 does not linger in the back button.
 
 ### (g) The header that triggers a CORS preflight
+
 There is one operational gotcha that turns a working local setup into 401s and console errors the moment
 auth is added. When your app and API are on different origins (different host, port, or scheme — a dev
 front end on one port calling an API on another counts), adding a custom `Authorization` header makes the
@@ -326,6 +335,7 @@ among the allowed headers so the preflight passes. This is not a React bug; it i
 same-origin policy, and it appears exactly when you add the Bearer header from step (c).
 
 ## Say It in an Interview
+
 - *"The arc: a controlled login form posts credentials, the API returns a signed JWT, I store it, attach it
   on every request with one Axios interceptor, and shape the UI from its claims — while the server
   re-validates every call."*
@@ -338,6 +348,7 @@ same-origin policy, and it appears exactly when you add the Bearer header from s
   the server must allow."*
 
 ## Check Yourself
+
 1. Walk the arc from typed credentials to a rendered, personalized dashboard. What are the stages?
 2. State the `localStorage`-vs-HttpOnly-cookie trade-off in terms of XSS and CSRF.
 3. Why does the client decode but never verify the JWT, and what stops a user who forges a role in devtools?
@@ -363,6 +374,7 @@ browser-side UX; the server must authorize every protected request, since anyone
 `Authorization` header.
 
 ## Summary
+
 - The arc is one connected chain: controlled login -> JWT -> storage -> interceptor -> decode -> auth state
   -> gated UI and routes; break any link and the rest misbehaves.
 - Token storage is a real trade-off: `localStorage` (XSS-exposed, CSRF-free) vs HttpOnly cookie (XSS-safe,
@@ -376,6 +388,7 @@ browser-side UX; the server must authorize every protected request, since anyone
 - Adding the Bearer header triggers a CORS preflight `OPTIONS` the server must explicitly allow.
 
 ## Resources
+
 - [`<Navigate>` and route protection (reactrouter.com)](https://reactrouter.com/en/main/components/navigate)
 - [Introduction to JSON Web Tokens (jwt.io)](https://jwt.io/introduction)
 - [Cross-Origin Resource Sharing (CORS) — MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)

@@ -1,6 +1,7 @@
 # SPAs vs MPAs and How the Virtual DOM Works
 
 ## Learning Objectives
+
 - Explain the difference between a Single Page Application and a Multi Page Application.
 - Weigh the tradeoffs of each architecture honestly.
 - Describe what the Virtual DOM is and why React uses one.
@@ -8,6 +9,7 @@
 - Connect keys and stable identity to how reconciliation performs.
 
 ## Why This Matters
+
 "What is an SPA?" and "how does the Virtual DOM work?" are two of the most reliable front-end interview
 questions, and they are linked: React exists to make SPAs feel fast, and the Virtual DOM is the mechanism
 that delivers it. Beyond interviews, understanding this shapes real decisions — whether a project should be
@@ -18,6 +20,7 @@ to explain it clearly separates people who *use* React from people who *understa
 ## The Concept
 
 ### Multi Page Applications (MPA)
+
 The traditional web model. Every navigation — clicking a link, submitting a form — sends a request to the
 server, which responds with a **whole new HTML page**. The browser throws away the current document and
 renders the new one from scratch. Each URL maps to a distinct document the server produces.
@@ -29,6 +32,7 @@ renders the new one from scratch. Each URL maps to a distinct document the serve
   client state; shared UI like headers and nav bars are re-sent and re-rendered on every page.
 
 ### Single Page Applications (SPA)
+
 An SPA loads **one** HTML shell once, plus a JavaScript bundle. From then on, navigation happens
 **client-side**: JavaScript swaps the visible content in place and updates the URL without fetching a new
 document. Data still comes from the server, but as JSON over API calls (fetch/Axios), not as new HTML
@@ -41,6 +45,7 @@ pages. React apps are SPAs by default.
   until JavaScript runs; and the app must manage routing, history, and state itself.
 
 ### Choosing between them
+
 There is no universally correct answer. Content-first sites where SEO and fast first paint dominate — blogs,
 marketing pages, documentation — lean MPA (or an SPA framework with server rendering). Highly interactive,
 app-like experiences where users stay a while and navigate constantly — dashboards, editors, an internal
@@ -48,12 +53,14 @@ catalog management tool — lean SPA. Many modern frameworks blur the line by re
 hydrating into an SPA, getting the first-paint/SEO benefits of an MPA with the in-app feel of an SPA.
 
 ### The problem the Virtual DOM solves
+
 The real DOM — the browser's live tree of page elements — is expensive to change. Touching it triggers
 style recalculation, layout, and repaint, and doing many small updates in a loop can be slow and janky. In
 an SPA, the UI changes constantly as state updates, so naive "just rewrite the DOM whenever anything
 changes" would be far too slow. React's answer is to put a fast, in-memory layer in front of the real DOM.
 
 ### What the Virtual DOM is
+
 The **Virtual DOM** is a lightweight JavaScript representation of your UI — a tree of plain objects
 describing what the DOM *should* look like. It is cheap to create and cheap to compare because it is just
 objects in memory, not real browser nodes. Every time your component renders, React builds a fresh Virtual
@@ -73,6 +80,7 @@ Crucially, building that object tree does **not** touch the real DOM. It is a de
 itself.
 
 ### Reconciliation: diffing old tree against new
+
 When state changes, React re-renders the component and produces a **new** Virtual DOM tree. It then compares
 this new tree against the **previous** one — this comparison is called **reconciliation**, and the
 comparison itself is the **diff**. React walks both trees and works out the smallest set of real-DOM
@@ -93,6 +101,7 @@ are assumed to produce different subtrees (so it replaces rather than deep-compa
 by **key**.
 
 ### Why keys matter to reconciliation
+
 This is where keys connect. When React diffs a list, it needs to decide which new items correspond to which
 old items. If items carry stable `key` props, React matches them by identity: it can tell that an item
 moved, or that one was inserted in the middle, and reuse the existing DOM nodes for the rest. Without stable
@@ -102,6 +111,7 @@ state (input values, focus, checkbox state) to the wrong element. Good keys make
 minimal.
 
 ### A practical consequence: let React own the DOM
+
 Because React is diffing its own model of the UI against the real DOM, you should let React make the DOM
 changes. Reaching in and manually editing DOM nodes that React manages puts the real page out of sync with
 React's Virtual DOM model, and the next reconciliation can overwrite or fight your change. The React way is
@@ -109,6 +119,7 @@ to change **state**; React re-renders, diffs, and updates the DOM for you. Descr
 for a given state, and let reconciliation figure out *how* to get there.
 
 ## Say It in an Interview
+
 - *"An MPA fetches a whole new HTML page from the server on every navigation; an SPA loads one shell once
   and swaps views client-side with JavaScript, pulling data as JSON. SPAs feel instant after load but cost
   more upfront and need extra work for SEO."*
@@ -120,6 +131,7 @@ for a given state, and let reconciliation figure out *how* to get there.
   instead of rebuilding the list."*
 
 ## Check Yourself
+
 1. In one sentence each, contrast how an MPA and an SPA handle navigation.
 2. Give one strength and one weakness of an SPA compared to an MPA.
 3. What is the Virtual DOM, and why is it cheaper to work with than the real DOM?
@@ -137,6 +149,7 @@ items by identity so React can reuse and reorder existing DOM nodes; without sta
 position and can do extra work and attach per-item DOM state to the wrong element.
 
 ## Summary
+
 - **MPA:** server sends a new HTML page per navigation; great SEO/first paint, but full reloads.
 - **SPA:** one shell loads once, JavaScript swaps views client-side and fetches JSON; instant navigation,
   but heavier first load and SEO needs extra work. React apps are SPAs by default.
@@ -147,6 +160,7 @@ position and can do extra work and attach per-item DOM state to the wrong elemen
   let React own the DOM rather than editing it by hand.
 
 ## Resources
+
 - [Preserving and Resetting State — react.dev](https://react.dev/learn/preserving-and-resetting-state)
 - [Render and Commit — react.dev](https://react.dev/learn/render-and-commit)
 - [Single-page application (SPA) — MDN Glossary](https://developer.mozilla.org/en-US/docs/Glossary/SPA)

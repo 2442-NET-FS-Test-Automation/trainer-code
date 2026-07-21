@@ -1,12 +1,14 @@
 # Rendering Lists, Keys, and Conditional UI
 
 ## Learning Objectives
+
 - Render a dynamic list by mapping an array of data to an array of elements.
 - Give each list item a stable, unique `key` and explain what React uses it for.
 - Recognize why the array index is a poor key when the list can change.
 - Conditionally render UI from state or interaction using a ternary and the `&&` operator.
 
 ## Why This Matters
+
 Almost every real interface is a list: a catalog of books, rows in a table, search results, a cart. React
 does not have a "for-each" template directive — you render lists with plain JavaScript's `.map()`, which
 surprises people coming from other frameworks. And the very next thing an interviewer asks is "what's the
@@ -18,6 +20,7 @@ bulk of day-to-day component code.
 ## The Concept
 
 ### Rendering a list with `.map()`
+
 To turn data into UI, call `.map()` on the array and return one element per item. `.map()` produces an
 array of elements, and React knows how to render an array of elements directly inside JSX.
 
@@ -42,6 +45,7 @@ This is why data drives the UI: change the array, and the rendered list changes 
 special loop syntax to learn — if you can `.map()` an array in JavaScript, you can render a list in React.
 
 ### The `key` prop: how React tracks items across renders
+
 Notice `key={book.id}` above. When a list re-renders, React needs to match each new element to the element
 it drew last time, so it can figure out the minimal set of changes: which rows stayed, which were added,
 which were removed, which reordered. The **key** is the identity tag React uses for that matching.
@@ -60,6 +64,7 @@ the key purely internally; it is not passed to your component as a prop and neve
 ```
 
 ### Why the array index is usually a bad key
+
 It is tempting to write `key={index}` using `.map((item, index) => ...)`. It silences React's
 "each child needs a key" warning, so it looks fine — until the list changes order or items are inserted or
 removed. Because the index describes a *position*, not an *item*, React mis-matches elements when positions
@@ -81,6 +86,7 @@ generate a stable ID once when you create the item (for example with `crypto.ran
 alongside the data, rather than deriving a key from the position.
 
 ### Keys make reconciliation efficient
+
 The payoff of good keys is performance and correctness. React compares the previous render's tree to the
 new one (a process called reconciliation) and, guided by keys, applies only the differences to the real
 DOM. Add one book to a list of a hundred and React inserts one `<li>` — it does not tear down and rebuild
@@ -88,6 +94,7 @@ the other ninety-nine. Stable keys are what let React do that minimal, targeted 
 re-creating the whole list.
 
 ### Conditional rendering with a ternary
+
 Often you want to show different UI depending on state — loading versus loaded, empty versus populated,
 error versus content. Because JSX interpolates expressions, the ternary operator `cond ? a : b` is the
 cleanest tool when you are choosing between **two** branches.
@@ -114,6 +121,7 @@ Either the list or the empty-state message renders, never both. Ternaries can wr
 this, and they read naturally as "if books, show the list; otherwise, show the message."
 
 ### Conditional rendering with `&&`
+
 When you want to show something **or nothing** — a single branch with no "else" — the logical `&&` operator
 is more concise. `condition && <Element />` evaluates to the element when the condition is truthy and to
 the falsy value (which React renders as nothing) when it is not.
@@ -136,6 +144,7 @@ compute the element in a variable above the `return` and interpolate it — deep
 JSX get unreadable fast.
 
 ## Say It in an Interview
+
 - *"You render lists in React by mapping an array of data to an array of elements — there's no special loop
   directive, it's just JavaScript's .map()."*
 - *"The key prop gives each list item a stable identity so React can match items across renders and update
@@ -146,6 +155,7 @@ JSX get unreadable fast.
   accidentally render a 0."*
 
 ## Check Yourself
+
 1. How do you render a list of items in JSX, and what does `.map()` return?
 2. What does React use the `key` prop for, and what two properties must a key have?
 3. Give a concrete scenario where using the array index as a key produces a visible bug.
@@ -162,6 +172,7 @@ showing one piece of UI or nothing. (5) `0` is falsy so `&&` returns `0`, and Re
 `0`; guard with a boolean expression such as `{count > 0 && <Badge/>}`.
 
 ## Summary
+
 - Render lists with `.map()`; it returns an array of elements that React renders in order.
 - Every list item needs a `key` that is **unique among siblings** and **stable across renders** — use a
   real ID, not the array index.
@@ -172,6 +183,7 @@ showing one piece of UI or nothing. (5) `0` is falsy so `&&` returns `0`, and Re
   do not render a `0`.
 
 ## Resources
+
 - [Rendering Lists — react.dev](https://react.dev/learn/rendering-lists)
 - [Conditional Rendering — react.dev](https://react.dev/learn/conditional-rendering)
 - [Preserving and Resetting State — react.dev](https://react.dev/learn/preserving-and-resetting-state)

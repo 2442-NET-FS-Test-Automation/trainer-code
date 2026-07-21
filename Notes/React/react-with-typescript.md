@@ -1,12 +1,14 @@
 # React with TypeScript: Type-Checked Props
 
 ## Learning Objectives
+
 - Explain the concrete benefits TypeScript brings to a React codebase.
 - Write components in `.tsx` and type their props explicitly.
 - Build a reusable component with type-checked props, including optional props and typed callbacks.
 - Recognize the everyday TypeScript patterns you meet in real React code.
 
 ## Why This Matters
+
 The React ecosystem has largely converged on TypeScript, and "why use TypeScript with React?" is a standard
 interview question with a very concrete answer: it makes the invisible contract between components visible
 and enforced. In plain JavaScript, passing the wrong prop — a number where a string was expected, a
@@ -18,6 +20,7 @@ reuse, typed props *are* the documentation: the type tells the next developer ex
 ## The Concept
 
 ### The benefits of TypeScript in React
+
 Three payoffs matter most in day-to-day React work:
 
 - **Props become a checked contract.** A component declares exactly what props it accepts and their types.
@@ -34,6 +37,7 @@ and you occasionally install community type packages for untyped libraries. Vite
 TypeScript setup for you with the `react-ts` template, so there is no extra configuration to get started.
 
 ### `.tsx` files and typing props inline
+
 A React component written in TypeScript lives in a `.tsx` file (the `x` is for JSX). The core new habit is
 annotating the props parameter. For a small component, an inline object type is perfectly idiomatic:
 
@@ -59,6 +63,7 @@ Now the compiler enforces the contract at every call site:
 Those errors appear as you type, in the editor, before the app runs.
 
 ### Naming the props type with an interface or type alias
+
 Once a component has more than a couple of props, pull the shape into a named `type` or `interface` above
 the component. It reads better, is reusable, and is the more common style in real codebases.
 
@@ -83,6 +88,7 @@ function BookCard({ title, author, year }: BookCardProps) {
 `interface` for props by convention.
 
 ### Optional props, defaults, and union types
+
 Real components have optional and constrained props. A `?` marks a prop optional; a union type restricts a
 prop to a fixed set of values; default values are given with ordinary JavaScript defaults in the
 destructuring.
@@ -106,6 +112,7 @@ The union type `"info" | "warning" | "success"` is a small but high-value patter
 of typos impossible and gives you autocomplete of the valid options.
 
 ### Typing children and callbacks
+
 Two prop types come up constantly. When a component wraps other JSX, type the `children` prop as
 `React.ReactNode`. When a child reports events back to a parent, type the callback as a function.
 
@@ -146,6 +153,7 @@ type `(title: string) => void` guarantees the parent's handler has the right sig
 calls it correctly.
 
 ### Putting it together: a reusable, type-checked component
+
 Here is a small reusable component that combines the patterns — a named props interface, a required field,
 an optional field with a default, a union type, and a typed callback. Because every prop is typed, any
 caller gets checked and autocompleted.
@@ -198,6 +206,7 @@ That is the whole value proposition — the contract is written down once and en
 component is used.
 
 ## Say It in an Interview
+
 - *"TypeScript turns a component's props into a checked contract: pass the wrong type, misspell a prop, or
   omit a required one and it's a compile-time error at the call site, not a runtime surprise."*
 - *"On top of catching bugs, I get autocomplete on every prop and field and safe renames — and the prop
@@ -208,6 +217,7 @@ component is used.
   parent-child communication is verified in both directions."*
 
 ## Check Yourself
+
 1. Name three concrete benefits of using TypeScript in a React project.
 2. What is the difference between a `.jsx` and a `.tsx` file, and what habit changes when you write props?
 3. How do you make a prop optional, and how do you restrict it to a fixed set of allowed values?
@@ -224,6 +234,7 @@ can render — elements, strings, numbers, arrays, and `null`. (5)
 `interface CloseableProps { title: string; onClose: () => void; }`.
 
 ## Summary
+
 - TypeScript makes props a **checked contract**: wrong/missing/misspelled props fail at compile time, at
   the call site.
 - Extra payoffs: autocomplete, safe renames, and prop types that serve as documentation.
@@ -235,6 +246,7 @@ can render — elements, strings, numbers, arrays, and `null`. (5)
   `react-ts` template sets all of this up for you.
 
 ## Resources
+
 - [Using TypeScript — react.dev](https://react.dev/learn/typescript)
 - [React TypeScript Cheatsheet — react-typescript-cheatsheet.netlify.app](https://react-typescript-cheatsheet.netlify.app/)
 - [TypeScript template — Vite guide (vitejs.dev)](https://vitejs.dev/guide/#scaffolding-your-first-vite-project)

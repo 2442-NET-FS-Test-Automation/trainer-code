@@ -1,12 +1,14 @@
 # Events and Controlled Forms in React
 
 ## Learning Objectives
+
 - Handle DOM events in React with synthetic events, `onClick`, `onSubmit`, and `onChange`.
 - Prevent default browser behavior (`e.preventDefault()`) and pass arguments to event handlers.
 - Build controlled inputs whose value is driven by React state via `value` and `onChange`.
 - Manage multi-field form state and handle submission without a full-page reload.
 
 ## Why This Matters
+
 Almost every real interface is a form: a login box, a search bar, a "add to catalog" dialog. React's answer to
 "how do I read what the user typed" is the **controlled input** — state is the single source of truth for the
 field's value, and every keystroke flows through your code. Interviewers reliably ask you to explain controlled
@@ -17,6 +19,7 @@ characters.
 ## The Concept
 
 ### Synthetic events
+
 React does not attach native DOM listeners to each element. Instead it wraps native events in a
 **SyntheticEvent** — a cross-browser wrapper with the same API you already know (`e.target`, `e.preventDefault()`,
 `e.stopPropagation()`) — and delegates from the root. For everyday code this is invisible: you write handlers the
@@ -36,6 +39,7 @@ itself**, not a call. `onClick={handleClick}` registers the handler; `onClick={h
 during render and pass the return value, which is almost never what you want.
 
 ### Passing arguments to a handler
+
 When a handler needs extra data, wrap it in an arrow function so it is called at click time, not render time.
 
 ```tsx
@@ -53,6 +57,7 @@ If you also need the event, include it: `onClick={(e) => remove(id, e)}`. The mi
 `onClick={remove(id)}`, which invokes `remove` immediately on every render.
 
 ### Controlled inputs
+
 A **controlled** input takes its displayed value from React state. You set `value={state}` and update that state
 in `onChange`. The state is the single source of truth; the DOM never holds a value React does not know about.
 
@@ -79,6 +84,7 @@ The contrast is an **uncontrolled** input, where the DOM keeps the value and you
 resetting trivial because the value always lives in state you can see.
 
 ### Managing a whole form
+
 For several fields, hold them in one state object and use a single change handler keyed by the input's `name`.
 Spread the previous object so the update stays immutable.
 
@@ -126,6 +132,7 @@ One handler, driven by the computed key `[name]`, updates whichever field fired.
 `checked` (a boolean) rather than `value`, which is why the handler branches on `type`.
 
 ### Submitting without a page reload
+
 A native `<form>` submit reloads the page — the classic full-page-refresh behavior React is built to avoid. Call
 `e.preventDefault()` in the `onSubmit` handler to stop the browser, then do your work in JavaScript.
 
@@ -158,6 +165,7 @@ is the accessible, expected behavior. After a successful submit, resetting the f
 object — another payoff of keeping the value in state.
 
 ## Say It in an Interview
+
 - *"React events are synthetic events: a cross-browser wrapper over the native event with the same API. Handlers
   are camelCase and I pass the function, not a call."*
 - *"A controlled input gets its value from state via `value` and updates state in `onChange`, so state is the
@@ -167,6 +175,7 @@ object — another payoff of keeping the value in state.
   render."*
 
 ## Check Yourself
+
 1. What is a synthetic event, and why does React use one instead of the raw DOM event?
 2. What is the difference between `onClick={handle}` and `onClick={handle()}`?
 3. Which two props make a text input "controlled," and what is the data loop between them?
@@ -184,6 +193,7 @@ onChange -> setState -> re-render -> value shows new text. (4) Give each input a
 fires when the user presses Enter, which is the expected accessible behavior.
 
 ## Summary
+
 - React events are **synthetic events**: camelCase props (`onClick`, `onChange`, `onSubmit`), pass the function
   not a call, and wrap in an arrow to pass arguments.
 - **Controlled inputs** drive their `value` from state and update it in `onChange`; state is the single source of
@@ -192,6 +202,7 @@ fires when the user presses Enter, which is the expected accessible behavior.
 - On submit, call `e.preventDefault()` to stop the page reload and put `onSubmit` on the `<form>` so Enter works.
 
 ## Resources
+
 - [Responding to Events (react.dev)](https://react.dev/learn/responding-to-events)
 - [Reacting to Input with State (react.dev)](https://react.dev/learn/reacting-to-input-with-state)
 - [`<input>` — Controlled components (react.dev)](https://react.dev/reference/react-dom/components/input)

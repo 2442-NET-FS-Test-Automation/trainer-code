@@ -1,12 +1,14 @@
 # useReducer: Centralizing Complex State Transitions
 
 ## Learning Objectives
+
 - Read the reducer signature `(state, action) => newState` and explain each part.
 - Model actions as a TypeScript discriminated union and narrow them in a `switch`.
 - Drive a small state machine (idle to loading to success or error) with `useReducer` and `dispatch`.
 - Choose between `useReducer` and `useState`, and always return new immutable state from the reducer.
 
 ## Why This Matters
+
 `useState` is perfect until the pieces of state start depending on each other. When "loading is true" must
 also mean "error is null and data is untouched," scattering three separate `setX` calls across event
 handlers invites contradictory states — a spinner showing next to an error message that shouldn't exist.
@@ -18,6 +20,7 @@ into spaghetti.
 ## The Concept
 
 ### The reducer signature: `(state, action) => newState`
+
 A reducer is a pure function that takes the **current state** and an **action** describing what happened,
 and returns the **next state**. It never mutates its inputs and never reaches outside itself (no `fetch`, no
 timers) — same inputs, same output, every time:
@@ -37,6 +40,7 @@ const [state, dispatch] = useReducer(reducer, initialState);
 ```
 
 ### Actions as a discriminated union
+
 In TypeScript, model the set of possible actions as a **discriminated union** — a union of object types that
 share a literal `type` field. This is what makes the reducer type-safe: once you `switch` on `action.type`,
 TypeScript narrows the action inside each `case` so you get exactly the payload that action carries, and it
@@ -60,6 +64,7 @@ Because the union is closed, adding a fifth action type and forgetting a `case` 
 error (with `strict` settings), not a runtime surprise.
 
 ### A state machine with useReducer
+
 Here is the classic use: a status field that can only be one of a few known values, with data and error
 that must stay consistent with it. Modeling `status` as a union of string literals makes impossible states
 unrepresentable.
@@ -123,6 +128,7 @@ Every legal transition is visible in one `switch`. To understand how login behav
 not five scattered handlers.
 
 ### Immutable returns are mandatory
+
 A reducer must return a **new** object, never mutate the old one. React decides whether to re-render by
 comparing the returned reference to the previous state; mutating in place keeps the same reference and the
 UI can silently fail to update. Build new objects and arrays with spreads:
@@ -142,10 +148,11 @@ The same immutability rule that governs `useState` governs reducers; the reducer
 one auditable place.
 
 ### useReducer vs useState
+
 Both manage state and both trigger re-renders. Choose by the shape of the problem:
 
 | Reach for `useState` when | Reach for `useReducer` when |
-|---|---|
+| --- | --- |
 | One or two independent values | Several fields that must change together consistently |
 | Updates are simple `setX(newValue)` | State is a machine with named transitions (idle/loading/success/error) |
 | No interdependence between pieces | The next state depends on the current state in non-trivial ways |
@@ -157,6 +164,7 @@ where a reducer earns its keep. A useful tell: if you find yourself calling seve
 together to keep them in sync, that is a reducer waiting to be written.
 
 ## Say It in an Interview
+
 - *"A reducer is a pure function (state, action) => newState. useReducer gives you the current state and a
   dispatch function; you dispatch actions and React runs the reducer to get the next state."*
 - *"I type actions as a discriminated union on a literal `type` field, then switch on it — TypeScript
@@ -167,6 +175,7 @@ together to keep them in sync, that is a reducer waiting to be written.
   the UI won't update."*
 
 ## Check Yourself
+
 1. Write the reducer signature and say what each of the three parts is.
 2. What does `useReducer` return, and how do you trigger a state change?
 3. Why model actions as a discriminated union instead of a loose object with an optional payload?
@@ -183,6 +192,7 @@ must update together. (5) React compares references to decide whether to re-rend
 unchanged, so the component can silently fail to update.
 
 ## Summary
+
 - A reducer is a pure function `(state, action) => newState`; `useReducer(reducer, initial)` returns
   `[state, dispatch]`.
 - Type actions as a discriminated union on a literal `type` field so a `switch` narrows each case and
@@ -194,6 +204,7 @@ unchanged, so the component can silently fail to update.
   together or transitions get complex — a sign is calling several setters in sync.
 
 ## Resources
+
 - [useReducer (react.dev)](https://react.dev/reference/react/useReducer)
 - [Extracting State Logic into a Reducer (react.dev)](https://react.dev/learn/extracting-state-logic-into-a-reducer)
 - [Discriminated unions (TypeScript Handbook)](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions)

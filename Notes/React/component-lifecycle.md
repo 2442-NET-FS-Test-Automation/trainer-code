@@ -1,12 +1,14 @@
 # The Component Lifecycle with useEffect
 
 ## Learning Objectives
+
 - Describe the three lifecycle phases of a React component: mount, update, and unmount.
 - Model those phases in function components with `useEffect` and its cleanup return.
 - Control when an effect runs with the dependency array (`[]`, `[dep]`, or none).
 - Clean up subscriptions, timers, and listeners on unmount to prevent leaks and stale updates.
 
 ## Why This Matters
+
 Components are not static — they appear on screen, react to changing data, and eventually disappear. Anything
 that reaches outside React (fetching data, starting a timer, subscribing to an event) has to be started and,
 crucially, stopped at the right moments, or you leak memory and get "set state on an unmounted component"
@@ -17,6 +19,7 @@ questions. Misunderstanding the deps array is the number-one source of infinite 
 ## The Concept
 
 ### The three lifecycle phases
+
 Every component moves through the same phases:
 
 - **Mount** — the component is created and inserted into the DOM for the first time.
@@ -29,6 +32,7 @@ effect and *when* it should re-synchronize, and React runs it after the relevant
 the next run or on unmount.
 
 ### useEffect after render
+
 `useEffect` runs a function **after** the component renders and the DOM is painted. It is where you put side
 effects — work that touches something outside React's render output.
 
@@ -48,6 +52,7 @@ function Title() {
 ```
 
 ### The dependency array controls when it runs
+
 The second argument to `useEffect` decides how often the effect re-runs. This is the single most important thing
 to get right.
 
@@ -78,6 +83,7 @@ out gives you a stale closure (the effect keeps using an old value); adding unne
 often.
 
 ### The cleanup return: unmount and re-sync
+
 If an effect starts something that keeps running — a timer, a subscription, an event listener — it must stop it.
 Return a **cleanup function** from the effect. React calls it before the effect runs again *and* when the
 component unmounts.
@@ -122,6 +128,7 @@ old subscription torn down, new one set up. That "clean up, then re-apply" cycle
 keeps a component synchronized with the outside world.
 
 ### Fetching on mount
+
 The most common effect is loading data once when the component appears. An empty dependency array runs it on
 mount; the cleanup flag ignores a response that arrives after the component is gone.
 
@@ -136,11 +143,13 @@ useEffect(() => {
 ```
 
 ### A note on double-invocation in development
+
 In development with React's Strict Mode, React intentionally mounts, unmounts, and remounts each component once,
 so every effect runs twice on the first load. This is a check, not a bug: it surfaces effects that are missing
 cleanup. If your effect cleans up properly, the double run is harmless, and it does not happen in production.
 
 ## Say It in an Interview
+
 - *"A component mounts, updates when state or props change, and unmounts. Function components model all three with
   `useEffect`: the effect body handles mount and update side effects, and the returned cleanup function handles
   unmount."*
@@ -150,6 +159,7 @@ cleanup. If your effect cleans up properly, the double run is harmless, and it d
   React calls before the next run and on unmount, so there are no leaks or stale updates."*
 
 ## Check Yourself
+
 1. Name the three lifecycle phases and the single hook that models all of them in a function component.
 2. What is the difference in behavior between `useEffect(fn, [])`, `useEffect(fn, [x])`, and `useEffect(fn)` with
    no array?
@@ -166,6 +176,7 @@ a render, which reruns the effect, which sets state again — an infinite loop. 
 mount-only, or the specific values it should react to).
 
 ## Summary
+
 - Components **mount**, **update** (on state/prop change), and **unmount**; function components model all three
   with `useEffect`.
 - The effect body runs after render; the **dependency array** controls re-runs: `[]` = mount only, `[dep]` = when
@@ -176,6 +187,7 @@ mount-only, or the specific values it should react to).
   re-run and on unmount, keeping the component synchronized and leak-free.
 
 ## Resources
+
 - [Synchronizing with Effects (react.dev)](https://react.dev/learn/synchronizing-with-effects)
 - [Lifecycle of Reactive Effects (react.dev)](https://react.dev/learn/lifecycle-of-reactive-effects)
 - [useEffect reference (react.dev)](https://react.dev/reference/react/useEffect)

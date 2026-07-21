@@ -1,12 +1,14 @@
 # Controlled vs Uncontrolled Components: Who Owns the Input's Value
 
 ## Learning Objectives
+
 - Define a controlled component: its value is driven by React state through `onChange`.
 - Define an uncontrolled component: the DOM holds the value, read on demand with a ref and `defaultValue`.
 - Compare the two and choose deliberately, weighing the trade-offs of each.
 - Implement the same form both ways and read the value out correctly in each.
 
 ## Why This Matters
+
 Every form in React answers one question: **where does the input's current value actually live?** Either
 React state is the source of truth (controlled) or the browser's DOM node is (uncontrolled). Getting this
 wrong produces the two classic bugs — an input you cannot type into (you set `value` but forgot
@@ -17,6 +19,7 @@ you to say out loud how data flows through a form.
 ## The Concept
 
 ### Controlled: React state is the single source of truth
+
 In a controlled input, you bind the element's `value` to a piece of state and update that state on every
 keystroke via `onChange`. The DOM node never holds an independent value — it renders whatever state says,
 and every edit round-trips through React. This is the default you should reach for.
@@ -56,6 +59,7 @@ will warn about. If you truly want a fixed value, use `readOnly`; otherwise the 
 always travel together.
 
 ### Uncontrolled: the DOM holds the value, you read it with a ref
+
 An uncontrolled input lets the browser do what it has always done — store the value in the DOM node itself.
 React does not track it on every keystroke. You seed an optional initial value with `defaultValue` (not
 `value`), and when you actually need the data — usually at submit — you read it off the node through a
@@ -88,6 +92,7 @@ the value is invisible to React between reads: you cannot easily disable the but
 fly, or react to the field mid-edit without adding back the very machinery you were avoiding.
 
 ### The `defaultValue` vs `value` distinction
+
 This single prop choice *is* the fork in the road:
 
 - `value={x}` makes the input **controlled** — React owns it, and you must supply `onChange` or the field
@@ -100,8 +105,9 @@ a live input from one mode to the other (e.g. `value={x ?? undefined}`) triggers
 "changing an uncontrolled input to be controlled" warning. Pick a mode per field and stay in it.
 
 ### Side by side, and when to use each
+
 | | Controlled | Uncontrolled |
-|---|---|---|
+| --- | --- | --- |
 | Source of truth | React state | The DOM node |
 | Initial value prop | `value` | `defaultValue` |
 | Reading the value | already in state | `ref.current.value` on demand |
@@ -117,6 +123,7 @@ read-only and therefore always uncontrolled. In modern React the honest default 
 is the deliberate optimization or interop escape hatch, not the starting point.
 
 ## Say It in an Interview
+
 - *"A controlled component's value lives in React state — you bind `value` and update it in `onChange`, so
   state is the single source of truth. An uncontrolled component leaves the value in the DOM and you read it
   with a ref when you need it."*
@@ -127,6 +134,7 @@ is the deliberate optimization or interop escape hatch, not the starting point.
   widgets."*
 
 ## Check Yourself
+
 1. What single prop decides whether an input is controlled or uncontrolled, and what is its uncontrolled
    counterpart?
 2. You set `value={name}` on an input and it won't let you type. What is missing, and why?
@@ -144,6 +152,7 @@ keystroke and needs less boilerplate. (5) `<input type="file">` — its value is
 uncontrolled.
 
 ## Summary
+
 - The core question is who owns the value: React state (controlled) or the DOM node (uncontrolled).
 - Controlled = `value` + `onChange`, value always in state, ideal for validation and conditional UI.
 - Uncontrolled = `defaultValue` + a `ref` read on demand, no re-render per keystroke, good for simple or
@@ -152,6 +161,7 @@ uncontrolled.
 - Default to controlled; use uncontrolled deliberately — and always for file inputs.
 
 ## Resources
+
 - [Sharing State Between Components / Controlling an input (react.dev)](https://react.dev/learn/sharing-state-between-components)
 - [`<input>` component reference (react.dev)](https://react.dev/reference/react-dom/components/input)
 - [Manipulating the DOM with Refs (react.dev)](https://react.dev/learn/manipulating-the-dom-with-refs)

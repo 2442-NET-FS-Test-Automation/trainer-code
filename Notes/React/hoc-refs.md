@@ -1,6 +1,7 @@
 # Refs and Higher-Order Components: Escaping and Reusing
 
 ## Learning Objectives
+
 - Use `useRef` to hold a mutable `.current` value that survives re-renders without triggering one.
 - Attach a ref to a DOM node to read or command it imperatively.
 - Write a higher-order component `withX(Component)` that wraps a component to add behavior.
@@ -8,6 +9,7 @@
   replace HOCs today.
 
 ## Why This Matters
+
 Two recurring needs sit just outside the everyday `useState`-and-props flow. First, sometimes you need to
 remember a value *between renders without re-rendering* — a timer id, a previous value, a click count you
 don't display — and state is the wrong tool because changing it would repaint the screen. Second, sometimes
@@ -19,6 +21,7 @@ and would you still use one?"
 ## The Concept
 
 ### Refs: mutable values that don't trigger a re-render
+
 `useRef` returns a plain object with a single mutable property, `.current`. React preserves that object
 across every render, but — unlike state — **reassigning `.current` does not cause a re-render**. It is a box
 for values that need to persist but should not drive the UI.
@@ -42,7 +45,7 @@ function ClickCounter() {
 The contrast with `useState` is the whole lesson:
 
 | `useState` | `useRef` |
-|---|---|
+| --- | --- |
 | Changing it **re-renders** the component | Changing `.current` does **not** re-render |
 | Value is what the UI reflects | Value is bookkeeping the UI does not directly show |
 | Read the latest value after re-render | Read the latest value synchronously any time |
@@ -63,6 +66,7 @@ function AutoSaver() {
 ```
 
 ### Refs to DOM nodes
+
 The other half of `useRef` is reaching a real DOM element to do something React's declarative model does not
 cover: focus an input, measure a box, scroll to a position, play a video. Create a ref, pass it to an
 element's `ref` attribute, and after mount `.current` points at the live DOM node.
@@ -91,6 +95,7 @@ Use a DOM ref only for genuinely imperative jobs. If a value determines what the
 state or props — reach for a ref to *command* a node, not to describe it.
 
 ### Higher-order components: `withX(Component)`
+
 A higher-order component (HOC) is a **function that takes a component and returns a new component** wrapping
 it with extra behavior. It is a pattern, not an API — just a function. The classic shape is a gate that adds
 a cross-cutting concern (auth, logging, a loading guard) around any component:
@@ -125,6 +130,7 @@ const ProtectedDashboard = withAuth(Dashboard);
 is the point of an HOC.
 
 ### Container vs presentational components
+
 A related way to organize reusable logic is to split a feature in two:
 
 - A **container** component holds the logic: it fetches data, keeps state, and computes values.
@@ -157,6 +163,7 @@ The presentational `BookList` knows nothing about where books come from, so it c
 tested by simply handing it an array.
 
 ### Why hooks often replace HOCs today
+
 HOCs and container components were the pre-hooks way to share logic, and they have real drawbacks: nesting
 several HOCs buries the real component in a stack of wrappers ("wrapper hell"), and it gets murky which
 props come from where. **Custom hooks** now cover most of the same ground more directly. Instead of wrapping
@@ -181,6 +188,7 @@ No wrapper component, no prop plumbing, no ambiguity about where `user` came fro
 and interviewers ask — but for new code, a custom hook is usually the cleaner reach.
 
 ## Say It in an Interview
+
 - *"useRef gives you a mutable .current that survives re-renders but doesn't cause one — I use it for timer
   ids, previous values, or anything the UI doesn't need to display."*
 - *"Attach a ref to an element's ref attribute and .current becomes the real DOM node after mount, for
@@ -191,6 +199,7 @@ and interviewers ask — but for new code, a custom hook is usually the cleaner 
   usually reach for a custom hook instead of an HOC to avoid wrapper hell."*
 
 ## Check Yourself
+
 1. What does `useRef` return, and how does changing it differ from changing state?
 2. Give two legitimate uses for a ref — one non-DOM, one DOM.
 3. Define a higher-order component in one sentence. What does `withAuth(Dashboard)` produce?
@@ -207,6 +216,7 @@ hooks share logic without wrapping components, avoiding wrapper hell and the amb
 props originate.
 
 ## Summary
+
 - `useRef` holds a mutable `.current` that persists across renders and never triggers one — ideal for timer
   ids, previous values, and other non-visual bookkeeping.
 - Attach a ref to an element's `ref` attribute to reach the real DOM node for imperative work (focus,
@@ -219,6 +229,7 @@ props originate.
   in existing code, but prefer hooks for new work.
 
 ## Resources
+
 - [useRef (react.dev)](https://react.dev/reference/react/useRef)
 - [Manipulating the DOM with Refs (react.dev)](https://react.dev/learn/manipulating-the-dom-with-refs)
 - [Reusing Logic with Custom Hooks (react.dev)](https://react.dev/learn/reusing-logic-with-custom-hooks)

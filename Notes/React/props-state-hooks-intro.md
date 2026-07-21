@@ -1,6 +1,7 @@
 # Props, State, and Your First Hooks
 
 ## Learning Objectives
+
 - Pass data into a component with props and read them inside.
 - Hold and update local component memory with the `useState` hook.
 - Explain what a hook is, and place `useState`, `useEffect`, and `useContext` in the landscape.
@@ -8,6 +9,7 @@
 - State the one-way data flow rule and why React is built around it.
 
 ## Why This Matters
+
 Props and state are the two ways data lives in a React app, and telling them apart is the single most
 tested React concept in interviews. Props are the arguments a component receives; state is the memory a
 component keeps between renders. Almost every bug a beginner hits — "why didn't my UI update," "why is my
@@ -18,6 +20,7 @@ data flows down, events flow up.
 ## The Concept
 
 ### Props: arguments passed into a component
+
 Props (short for "properties") are how a parent hands data to a child. You pass them like HTML attributes;
 the child receives a single object and reads the fields off it. Props are **read-only** — a component must
 never reassign its own props. If the parent later passes different values, the child re-renders with the
@@ -48,6 +51,7 @@ plus an inline type telling TypeScript what shape to expect. Same-named data, tw
 instances — that reuse is the whole point of props.
 
 ### State: memory a component keeps between renders
+
 Props come from outside; **state** is memory a component owns. A component re-renders (React re-runs the
 function) whenever its state changes, and the new UI reflects the new value. You create state with the
 `useState` hook.
@@ -81,6 +85,7 @@ produce a **new** one rather than mutating the old (`setBooks([...books, newBook
 whether to re-render by comparing references.
 
 ### What a hook is
+
 A **hook** is a function whose name starts with `use` that lets a plain function component "hook into"
 React features — state, lifecycle side effects, shared context — that used to require class components.
 Hooks follow two hard rules: call them only at the **top level** of a component (never inside loops,
@@ -100,6 +105,7 @@ open: "when I need to *do something outside rendering*, that's `useEffect`; when
 data*, that's `useContext`."
 
 ### Parent-to-child: pass data down as props
+
 Communication downward is what you have already seen — the parent renders the child with props. The parent
 can pass anything, including its own state, and when that state changes the child re-renders automatically.
 
@@ -111,6 +117,7 @@ function Library() {
 ```
 
 ### Child-to-parent: pass a callback down, the child calls it
+
 A child cannot reach up and change the parent's state directly — data does not flow upward. Instead the
 parent passes a **function** down as a prop, and the child **calls** that function to send data back up.
 The parent owns the state; the child merely requests a change.
@@ -146,6 +153,7 @@ re-renders, and the new query flows back down. This callback pattern is how ever
 something happened" interaction works: form submits, button clicks, list-item selections, delete buttons.
 
 ### One-way data flow
+
 Put the two directions together and you get React's defining principle: **data flows one way, downward.**
 Parents pass data to children through props; children never mutate what they receive. When a child needs to
 cause a change, it invokes a callback and the *parent* updates *its own* state, which then flows back down
@@ -158,6 +166,7 @@ anywhere. When two siblings need the same data, you **lift the state up** to the
 and pass it (plus a setter callback) down to both — same principle, applied one level higher.
 
 ## Say It in an Interview
+
 - *"Props are read-only inputs a parent passes to a child; state is private memory a component owns and
   updates with useState, which triggers a re-render."*
 - *"A hook is a use-prefixed function that lets a function component tap into React features like state and
@@ -168,6 +177,7 @@ and pass it (plus a setter callback) down to both — same principle, applied on
   state up to the nearest common parent."*
 
 ## Check Yourself
+
 1. What is the difference between props and state?
 2. What does `const [count, setCount] = useState(0)` give you, and what is the `0` for?
 3. Why does assigning `count = count + 1` fail to update the UI?
@@ -184,6 +194,7 @@ downward through props and children request changes via callbacks rather than mu
 "lifting state up" moves shared state to the nearest common ancestor so multiple children can use it.
 
 ## Summary
+
 - **Props** are read-only inputs passed from parent to child; **state** is a component's own memory.
 - `useState(initial)` returns `[value, setValue]`; call the setter (never assign) to trigger a re-render.
 - A **hook** is a `use`-prefixed function; `useState` (memory), `useEffect` (side effects), and
@@ -192,6 +203,7 @@ downward through props and children request changes via callbacks rather than mu
 - React is **one-way / unidirectional**: data flows down, events flow up; share data by lifting state up.
 
 ## Resources
+
 - [Passing Props to a Component — react.dev](https://react.dev/learn/passing-props-to-a-component)
 - [State: A Component's Memory — react.dev](https://react.dev/learn/state-a-components-memory)
 - [Sharing State Between Components — react.dev](https://react.dev/learn/sharing-state-between-components)
