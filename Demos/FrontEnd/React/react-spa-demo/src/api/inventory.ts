@@ -10,3 +10,8 @@ export async function getInventory(): Promise<InventoryItem[]> {
     const response = await api.get<InventoryItem[]>("/api/Inventory");
     return response.data; 
 }
+
+export async function getInventoryItem(sku: string): Promise<InventoryItem> {
+    const response = await api.get<InventoryItem>(`/api/Inventory/${sku}`);
+    return response.data;
+}

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import type { InventoryItem } from "../types";
 
 // This file will hold our first component with TSX and 
@@ -20,7 +21,9 @@ export function BookCard( {item, compact = false}: BookCardProps ) {
     // that allows us to drop in TS expressions and code using { }
     return(
         <article className="card">
-            <h3>{item.name}</h3>
+            <h3>
+                <Link to={`/inventory/${item.sku}`}>{item.name}</Link>
+            </h3>
             <dl>
                 <dt>SKU</dt>
                 <dd>{item.sku}</dd>
