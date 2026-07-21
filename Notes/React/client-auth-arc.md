@@ -78,7 +78,9 @@ The honest summary: `localStorage` trades CSRF-immunity for XSS exposure; HttpOn
 reverse. Cookies are generally the more defensible default for real applications; `localStorage` is common
 and acceptable when your XSS surface is tightly controlled. The examples here read from `localStorage`
 because it makes the client-side flow explicit, but the storage decision is independent of the rest of the
-arc.
+arc. The deep version of this trade-off — cookie attributes, XSS and CSRF mechanics, the defenses, and
+what a cookie switch costs on both ends of our stack — is its own note:
+[token-storage-cookies-xss-csrf.md](token-storage-cookies-xss-csrf.md).
 
 ### (c) Attach the token once: a single Axios request interceptor
 Do **not** hand-write an `Authorization` header at each call site — you will miss one. Register a single
