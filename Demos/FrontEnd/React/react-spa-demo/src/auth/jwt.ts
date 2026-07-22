@@ -28,7 +28,7 @@ export function decodeToken(token: string): Identity | null {
 
         // Now that we have the payload, we can grab the info from the claims
         const name = payload[NAME_CLAIM];
-        const role = payload[ROLE_CLAIM];
+        const role = payload[ROLE_CLAIM] ?? payload["role"];
 
         if(typeof name !== "string" || typeof role !== "string") return null;
 

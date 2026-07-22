@@ -7,6 +7,10 @@ import { useAuth } from "../auth/useAuth";
 // updated per keytroke. Submiting calls the login function from Context, that fires the POST
 // stores the token and decodes identity
 
+// admin user seeded
+// ada 
+// pass123!
+
 export function LoginPage() {
 
     const { login, status } = useAuth(); //grabbing stuff from context with our hook

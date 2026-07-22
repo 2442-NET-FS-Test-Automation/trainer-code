@@ -4,6 +4,8 @@ import { NavLink, Route, Routes } from 'react-router-dom';
 import { About } from './pages/About';
 import { BookDetail } from './pages/BookDetail';
 import { LoginPage } from './pages/LoginPage';
+import { RequireAuth } from './components/RequireAuth';
+import { AdminPage } from './pages/AdminPage';
 
 function App() {
 
@@ -26,6 +28,15 @@ function App() {
           <Route path='/inventory/:sku' element={<BookDetail />} />
           <Route path='/about' element= {<About /> } />
           <Route path='/login' element= {<LoginPage />} />
+          {/* Guarded admin-page - must be signed in AND role = "admin" */}
+          <Route 
+            path='/admin'
+            element={
+              <RequireAuth role="admin">
+                <AdminPage />
+              </RequireAuth>
+            }
+          />
           <Route path='*' element={<p>Page not found</p>} /> {/* consider a NotFound.tsx page? */}
         </Routes>
       </main>    
