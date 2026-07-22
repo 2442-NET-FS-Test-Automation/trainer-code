@@ -3,6 +3,7 @@ import { CatalogPage } from './components/CatalogPage';
 import { NavLink, Route, Routes } from 'react-router-dom';
 import { About } from './pages/About';
 import { BookDetail } from './pages/BookDetail';
+import { LoginPage } from './pages/LoginPage';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
                 api call)*/} 
           <Route path='/inventory/:sku' element={<BookDetail />} />
           <Route path='/about' element= {<About /> } />
+          <Route path='/login' element= {<LoginPage />} />
           <Route path='*' element={<p>Page not found</p>} /> {/* consider a NotFound.tsx page? */}
         </Routes>
       </main>    

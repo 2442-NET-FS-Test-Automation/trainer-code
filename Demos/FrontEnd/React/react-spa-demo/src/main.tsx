@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
+import { AuthProvider } from './auth/AuthContext.tsx'
 
 // BrowserRouter is a premade component that we can use to add routing to our application
 // It wrapps the whole app so that any components can declaure routes or link between them
@@ -12,7 +13,9 @@ import App from './App.tsx'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 )
