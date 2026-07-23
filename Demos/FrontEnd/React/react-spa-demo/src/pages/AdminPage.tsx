@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { SubmitEvent } from "react";
 import { createBook, deleteBook } from "../api/inventory";
 import { useAuth } from "../auth/useAuth";
@@ -15,6 +15,15 @@ export function AdminPage() {
     const [price, setPrice] = useState(0);
     const [stock, setStock] = useState(0);
     const [message, setMessage] = useState<string | null>(null);
+
+    // Uncontrolled input/form: The DOM holds the value, we read it from a ref only when we need to
+    // the opposite of the controlled fields in the main form - whose values are held in state.
+    const quickRef = useRef<HTMLInputElement>(null);
+    function copyFromQuickFind() {
+        if (quickRef.current) setSku(quickRef.current.value);
+    }
+
+
 
     // Now I need to define handlers for my create form's submit button
     // as well as the delete button 
@@ -76,6 +85,17 @@ export function AdminPage() {
                     Delete by sku
                 </button>
             </form>
+
+            <div className="quick-find">
+                {/* Uncontrolled: defaultValue seeds an initial value, DOM owns it after. We can read from it */}
+                <input ref={quickRef} defaultValue="" placeholder="Quick SKU (Uncontrolled)" />
+                <button type="button" onClick={copyFromQuickFind}> 
+                    Copy into form
+                </button>
+
+            </div>
+
+
             {message && <p>{message}</p>}
         </section>
     );

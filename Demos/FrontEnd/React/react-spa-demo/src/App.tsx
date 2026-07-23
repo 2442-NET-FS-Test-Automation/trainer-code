@@ -6,8 +6,11 @@ import { BookDetail } from './pages/BookDetail';
 import { LoginPage } from './pages/LoginPage';
 import { RequireAuth } from './components/RequireAuth';
 import { AdminPage } from './pages/AdminPage';
+import { useAuth } from './auth/useAuth';
 
 function App() {
+
+  const { status, user, logout } = useAuth()
 
   return (
     <div className="app">
@@ -16,7 +19,26 @@ function App() {
         <nav className='app-header'>
           <NavLink to="/">Catalog</NavLink>
           <NavLink to="/about">About</NavLink>
+          {/* Only admins can see the admin link */}
+          {user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
         </nav>
+
+      <div className='auth-box'>
+        {status === "authenticated" ? (
+          <>
+            <span>
+              {user?.name} ({user?.role})
+            </span>
+            <button type='button' onClick={logout}>
+              Sign out
+            </button>
+          </>
+        ) : (
+          <NavLink to="/login">Sign in</NavLink>
+        )}
+      </div>
+
+
       </header>
 
       <main>
@@ -40,7 +62,6 @@ function App() {
           <Route path='*' element={<p>Page not found</p>} /> {/* consider a NotFound.tsx page? */}
         </Routes>
       </main>    
-
     </div>
   );
 

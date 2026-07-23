@@ -23,6 +23,14 @@ export function LoginPage() {
     // Creating an object to let us navigate to another page automatically
     const navigate = useNavigate(); // tells the router to send us to another view
 
+    // A ref points at a DOM node WITHOUT causing re-renders. We will use it to move
+    // focus to the username field when the component mounts
+    // const usernameRef = useRef<HTMLInputElement>(null);
+
+    // useEffect(() =>{
+    //     usernameRef.current?.focus();
+    // })
+
     // Creating a function to call when the submit/login button on the form is pressed
     async function onSubmit(e: SubmitEvent<HTMLFormElement>) {
         
