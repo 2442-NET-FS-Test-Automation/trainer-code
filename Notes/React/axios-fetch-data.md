@@ -38,7 +38,7 @@ async function loadBooks(): Promise<Book[]> {
 Axios is a small HTTP client you add to the project like any dependency. This is the everyday act of leveraging
 an NPM library: install it, then import it where needed.
 
-```
+```bash
 npm install axios
 ```
 
