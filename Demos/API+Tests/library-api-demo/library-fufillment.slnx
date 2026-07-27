@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/Library.Tests.Unit/Library.Tests.Unit.csproj" />
+  </Folder>
   <Project Path="Library.Api/Library.Api.csproj" />
   <Project Path="Library.ControllerApi/Library.ControllerApi.csproj" />
   <Project Path="Library.Data/Library.Data.csproj" />
