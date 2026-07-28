@@ -78,4 +78,33 @@ public class InventoryControllerTests : IClassFixture<MapperFixture>
 
     }
 
+     [Fact]
+    public async Task GetBySku_UnknownSku_ReturnsNotFound()
+    {
+        // Arrange - loose mock default would return null anyway; being explicit reads better.
+        _service.Setup(s => s.BySkuAsync("NOPE")).ReturnsAsync((InventoryItem?)null);
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.GetBySku("NOPE");
+
+        // Assert
+        result.Result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task GetSupplierPrice_ReturnsClientPrice()
+    {
+        // Arrange - no real HTTP call to the supplier; the mock answers instantly.
+        _supplier.Setup(s => s.GetListPriceAsync("BK-001")).ReturnsAsync(12.34m);
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.GetSupplierPrice("BK-001");
+
+        // Assert - BeEquivalentTo compares by shape, so the controller's anonymous object matches ours.
+        var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.Value.Should().BeEquivalentTo(new { sku = "BK-001", supplierPrice = 12.34m });
+    }
+
 }
