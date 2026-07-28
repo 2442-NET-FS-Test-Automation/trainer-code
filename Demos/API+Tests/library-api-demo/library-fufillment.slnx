@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/tests/">
+    <Project Path="tests/Library.Tests.Integration/Library.Tests.Integration.csproj" />
     <Project Path="tests/Library.Tests.Unit/Library.Tests.Unit.csproj" />
   </Folder>
   <Project Path="Library.Api/Library.Api.csproj" />
