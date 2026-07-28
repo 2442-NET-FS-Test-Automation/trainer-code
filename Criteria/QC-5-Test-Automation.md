@@ -1,4 +1,4 @@
-# QC 6 (Test Automation) Criteria
+# QC 5 (Test Automation) Criteria
 
 ## Testing Philosophy
 
