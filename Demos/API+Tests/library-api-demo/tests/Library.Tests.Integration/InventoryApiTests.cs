@@ -3,16 +3,15 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Library.ControllerApi.DTOs;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Library.Tests.Integration;
 
-public class InventoryApiTests : IClassFixture<WebApplicationFactory<Program>>
+public class InventoryApiTests : IClassFixture<LibraryApiFactory>
 {
     // Arrange
     private readonly HttpClient _client;
 
-    public InventoryApiTests(WebApplicationFactory<Program> factory)
+    public InventoryApiTests(LibraryApiFactory factory)
     {
         _client = factory.CreateClient();
     }
@@ -93,5 +92,23 @@ public class InventoryApiTests : IClassFixture<WebApplicationFactory<Program>>
         deleted.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
     }
+
+    [Fact]
+    public async Task GetSupplierPrice_UsesTheFakeSupplier()
+    {
+        // Arrange - any signed in role may ask for supplier price
+        var client = await AsAdminAsync();
+
+        // Act
+        var response = await client.GetAsync("/api/Inventory/BK-001/supplier-price");
+
+        // Assert - FakeSupplierClient ALWAYS returns 99.99 - any other answer
+        // means we didn't properly configure our LibraryApiFactory
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadFromJsonAsync<SupplierPriceResponse>();
+        body!.supplierPrice.Should().Be(99.99m);
+    }
+
+    private record SupplierPriceResponse(string sku, decimal supplierPrice);
 
 }
