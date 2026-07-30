@@ -7,7 +7,8 @@ namespace Library.Tests.Integration;
 // only be proved through the middleware pipeline. That app.use
 // maintenance header Middleware fires before any controller method
 // This means no unit tests can see it. 
-public class MiddlewareTests: IClassFixture<LibraryApiFactory>
+[Collection("Library API")]
+public class MiddlewareTests
 {
     private readonly HttpClient _client; 
 

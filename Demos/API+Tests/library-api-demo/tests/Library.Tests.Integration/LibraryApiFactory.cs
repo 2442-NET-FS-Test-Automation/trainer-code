@@ -37,3 +37,9 @@ public class FakeSupplierClient : ISupplierClient
         return Task.FromResult<decimal?>(99.99m);
     }
 }
+
+// Collection Fixture: ONE factory (one in memory server, one EF setup, etc)
+// shared by every class that uses the appropriate tag [Collection("Library API")]
+// This avoids us having to boot the server up once per test class that needs it
+[CollectionDefinition("Library API")]
+public class LibraryApiCollection : ICollectionFixture<LibraryApiFactory>;

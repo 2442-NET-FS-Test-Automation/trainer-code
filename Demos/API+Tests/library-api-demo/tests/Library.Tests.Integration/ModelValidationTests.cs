@@ -12,7 +12,8 @@ namespace Library.Tests.Integration;
 // data we try to give them (min and max value, max length of a string, etc)
 // we can also test to make sure that ASP.NET model validation is enforcing those 
 // rules as well 
-public class ModelValidationTest : IClassFixture<LibraryApiFactory>
+[Collection("Library API")]
+public class ModelValidationTest
 {
     private readonly HttpClient _client;
 

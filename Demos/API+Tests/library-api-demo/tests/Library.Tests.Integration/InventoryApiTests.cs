@@ -6,7 +6,8 @@ using Library.ControllerApi.DTOs;
 
 namespace Library.Tests.Integration;
 
-public class InventoryApiTests : IClassFixture<LibraryApiFactory>
+[Collection("Library API")]
+public class InventoryApiTests
 {
     // Arrange
     private readonly HttpClient _client;

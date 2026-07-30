@@ -174,3 +174,9 @@ app.MapControllers();
 app.Run();
 
 Log.CloseAndFlush(); // Close and flush the logs (serilog)
+
+
+// "Program is inaccesible due to its protection level" - the snippet below
+// fixes that error and allows your integrations tests to use your API in 
+// .NET 8 and prior version - before we got top level statements. 
+// public partial class Program { };
