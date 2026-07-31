@@ -18,7 +18,7 @@ walkthrough exists so the first thing your team produces is a design artifact, n
 
 ---
 
-## Step 0 — Inventory your requirements (15 minutes, whole team)
+## Step 0 — Inventory your requirements
 
 Your requirements already exist: **your Project 2 user stories** — the required skeleton stories
 (register, log in/out, role enforcement, browse/search, create a transaction, own-history-only,
@@ -39,7 +39,7 @@ not split; more than 30 means you split past behaviors into implementation detai
 
 ---
 
-## Step 1 — Build the RTM skeleton (10 minutes)
+## Step 1 — Build the RTM skeleton 
 
 Create `docs/rtm.md` (or wherever your repo keeps docs) and land it by PR **today**, looking like
 this:
@@ -80,7 +80,7 @@ undocumented rule you should surface or waste you should delete. Either form is 
 
 ---
 
-## Step 2 — First requirement, designed end to end (the worked example; ~30-40 minutes with Step 3)
+## Step 2 — First requirement, designed end to end
 
 We will design one requirement completely, using the P2 spec's neutral vocabulary — a **catalog
 item** and a **transaction** — so translate into your own entities as you read. Suppose the
@@ -196,7 +196,7 @@ find a branch no case reaches, design the case that reaches it, and name it whit
 
 ---
 
-## Step 4 — The data decisions you just implicitly made (10 minutes)
+## Step 4 — The data decisions you just implicitly made 
 
 Steps 2-3 quietly used test data. The spec requires those choices to be **explicit**. For each test
 object, answer two questions from the note — *what data?* (the objective decides: the smallest set
