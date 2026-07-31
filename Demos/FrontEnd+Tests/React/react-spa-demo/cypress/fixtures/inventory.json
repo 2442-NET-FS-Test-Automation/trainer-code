@@ -1,0 +1,5 @@
+[
+    {"sku": "STUB-001", "name": "Stubbed Book One", "currentStock": 4},
+    {"sku": "STUB-002", "name": "Stubbed Book Two", "currentStock": 0},
+    {"sku": "STUB-003", "name": "Stubbed Book Three", "currentStock": 12}
+]
