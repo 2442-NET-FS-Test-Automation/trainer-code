@@ -44,15 +44,23 @@ not split; more than 30 means you split past behaviors into implementation detai
 Create `docs/rtm.md` (or wherever your repo keeps docs) and land it by PR **today**, looking like
 this:
 
-| Requirement | Cases | Covered |
-|---|---|---|
-| REQ-01 register | | no |
-| REQ-02 log in / log out | | no |
-| REQ-03 roles enforced (API) | | no |
-| REQ-04 roles enforced (UI) | | no |
-| REQ-05 create transaction — happy path | | no |
-| REQ-06 create transaction — validation | | no |
-| ... every requirement from Step 0 ... | | no |
+| Req ID | Requirement description | Priority | Test Case IDs | Coverage | Execution status | Defect IDs |
+|---|---|---|---|---|---|---|
+| REQ-01 | User can register | Must | | Not covered | Not run | |
+| REQ-02 | User can log in / log out | Must | | Not covered | Not run | |
+| REQ-03 | Roles enforced at the API | Must | | Not covered | Not run | |
+| REQ-04 | Roles enforced in the UI | Must | | Not covered | Not run | |
+| REQ-05 | Create transaction — happy path | Must | | Not covered | Not run | |
+| REQ-06 | Create transaction — quantity validation | Must | | Not covered | Not run | |
+| ... | every requirement from Step 0 | | | Not covered | Not run | |
+
+This is the standard industry column set, and the columns fill in at different moments in the
+project's life: **Test Case IDs** and **Coverage** flip when a case is *designed* (Step 2d),
+**Execution status** when the automation actually *runs* (Not run → Pass/Fail), and **Defect IDs**
+only when a failing run produces a filed finding — which is how one matrix traces requirement →
+case → result → defect end to end. **Priority** comes straight from your P2 stories (skeleton
+stories are Must; team stories are whatever you ranked them); it is what justifies the order you
+burn down rows in.
 
 An RTM with every row empty is not embarrassing — **it is the correct day-one artifact.** It is your
 declared to-do list, and its git history is your proof the matrix was maintained rather than
@@ -63,10 +71,10 @@ line — visibly.
 From here on, the working rule from the note applies: **cover every requirement once before covering
 any requirement twice.** When you are unsure what to design next, the next empty row is the answer.
 
-One thing this list form shows less well than the note's grid form (requirements as rows, case ids
-as columns): the **reverse read** — does every case trace to a requirement? The spec grades both
-directions. In the grid, an untraced case is a visible empty column; in the list, you find it by
-sweeping your case ids against the matrix — any `TC` that appears in no row is either an
+One thing this row-per-requirement form shows less well than the note's grid form (requirements as
+rows, case ids as columns): the **reverse read** — does every case trace to a requirement? The spec
+grades both directions. In the grid, an untraced case is a visible empty column; in the row form,
+you find it by sweeping your case ids against the matrix — any `TC` that appears in no row is either an
 undocumented rule you should surface or waste you should delete. Either form is acceptable
 ("format is your choice"), but **run both reads either way**, and say in your README how.
 
@@ -124,7 +132,9 @@ Notice what makes these *designed*: the expected result is written before execut
 is named with its reasoning visible (which edge, which class), and the trace ties every case to the
 requirement that permits it to exist.
 
-**2d. Mark the RTM.** REQ-06's row now reads `TC-01 .. TC-07 | yes`. Land the case docs and the
+**2d. Mark the RTM.** REQ-06's row now carries `TC-01 .. TC-07` in its Test Case IDs column and
+its Coverage flips to `Covered`; Execution status stays `Not run` and Defect IDs stays empty —
+those columns are earned by running, not designing. Land the case docs and the
 RTM update together in one PR. **This PR — design with no automation in it — is the evidence the
 spec grades.**
 
@@ -252,7 +262,7 @@ Four failure modes, all visible in the evidence the spec grades:
 2. **Doc-after-code** — case docs that trail their automation PRs. Same tell.
 3. **The untraced case** — a test that maps to no requirement. Either it found an undocumented rule
    (document it — genuine finding) or it is waste (delete it). In the grid RTM form this shows as an
-   empty case column; in the list form, the Step 1 reverse-read sweep finds it.
+   empty case column; in the row-per-requirement form, the Step 1 reverse-read sweep finds it.
 4. **The assert-everything case** — one case checking six behaviors. A red run should name one
    thing; one behavior per case.
 
