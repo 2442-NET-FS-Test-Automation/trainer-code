@@ -1,0 +1,31 @@
+{
+  "total": 1,
+  "totalPassed": 1,
+  "totalFailed": 0,
+  "totalSuites": 1,
+  "suites": [
+    {
+      "name": "visual.cy.js",
+      "path": "cypress\\e2e\\visual.cy.js",
+      "tests": [
+        {
+          "status": "pass",
+          "name": "visual.cy-catalog-stubbed",
+          "percentage": 0,
+          "failureThreshold": 0,
+          "specPath": "cypress\\e2e\\visual.cy.js",
+          "specFilename": "visual.cy.js",
+          "baselinePath": "cypress-image-diff-screenshots\\baseline\\visual.cy-catalog-stubbed.png",
+          "diffPath": "",
+          "comparisonPath": "cypress-image-diff-screenshots\\comparison\\visual.cy-catalog-stubbed.png"
+        }
+      ]
+    }
+  ],
+  "startedAt": "2026-08-03T17:58:10.546Z",
+  "endedAt": "2026-08-03T17:58:13.614Z",
+  "duration": 3068,
+  "browserName": "electron",
+  "browserVersion": "138.0.7204.251",
+  "cypressVersion": "15.19.0"
+}
