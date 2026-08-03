@@ -8,6 +8,11 @@ TestResults/
 coverage/
 .nyc_output/
 
+# Visual regression - the BASELINE folder is committed, run artifacts are not
+cypress-image-diff-screenshots/comparison/
+cypress-image-diff-screenshots/diff/
+cypress-image-diff-html-report/
+
 # Logs
 logs
 *.log
