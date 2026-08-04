@@ -1,6 +1,7 @@
 using FluentAssertions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using Xunit.Abstractions;
 
 namespace Library.Tests.E2E.Selenium;
 
@@ -10,8 +11,12 @@ public class SmokeTests : IDisposable
     // We need an instance of our driver - matched to our browser
     private readonly ChromeDriver _driver;
 
-    public SmokeTests()
+    // This would let us print to console, useful for debugging
+    private readonly ITestOutputHelper _output;
+
+    public SmokeTests(ITestOutputHelper output)
     {
+        _output = output;
 
         // Option classes: per browser launch config.
         // Headless makes it so chrome doesn't pop up
@@ -53,6 +58,8 @@ public class SmokeTests : IDisposable
 
         // Assert - using the same css selectors as Cypress. 
         var cards = _driver.FindElements(By.CssSelector("article.card"));
+        // using output to write to console
+        _output.WriteLine(cards.ToString());
         cards.Should().NotBeEmpty();
     }
 }
