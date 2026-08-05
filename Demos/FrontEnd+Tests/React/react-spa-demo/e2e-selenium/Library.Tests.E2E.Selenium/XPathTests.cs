@@ -51,7 +51,8 @@ public class XPathTests : IDisposable
 
 
         // <article class="card"></article>
-        // This would match an article with more than one class applied
+        // @class='card' is an EXACT string match - it would NOT match an
+        // article with more than one class applied, like:
         // <article class="card book some-other-class"></article>
         var cards = _driver.FindElements(By.XPath("//article[@class='card']"));
 
