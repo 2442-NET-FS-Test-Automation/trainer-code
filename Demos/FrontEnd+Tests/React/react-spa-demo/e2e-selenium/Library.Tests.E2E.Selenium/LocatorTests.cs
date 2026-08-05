@@ -1,6 +1,5 @@
 using FluentAssertions;
 using OpenQA.Selenium;
-using OpenQA.Selenium.BiDi.BrowsingContext;
 using OpenQA.Selenium.Chrome;
 
 namespace Library.Tests.E2E.Selenium;
