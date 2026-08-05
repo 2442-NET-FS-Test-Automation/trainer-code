@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Widget practice page</title>
+  <!-- Seed file (R-006): a static practice page for the browser controls the
+       Library SPA deliberately does not ship - select elements, hover menus,
+       double-click targets. The SPA is the real test target; this page exists
+       so the Select class and the Actions API have something true to drive.
+       No build, no server - Selenium loads it over file://. -->
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    section { margin-bottom: 2rem; padding: 1rem; border: 1px solid #ccc; }
+    #hover-menu { display: none; padding: 0.5rem; background: #eee; }
+    #hover-zone:hover #hover-menu { display: block; }
+  </style>
+</head>
+<body>
+  <h1>Widget practice page</h1>
+
+  <section id="select-widgets">
+    <h2>Select elements</h2>
+    <label for="format">Format</label>
+    <select id="format">
+      <option value="hard">Hardcover</option>
+      <option value="soft">Paperback</option>
+      <option value="ebook">E-book</option>
+      <option value="audio">Audiobook</option>
+    </select>
+
+    <label for="genres">Genres (multiple)</label>
+    <select id="genres" multiple size="4">
+      <option value="se">Software Engineering</option>
+      <option value="db">Databases</option>
+      <option value="web">Web</option>
+      <option value="ai">AI</option>
+    </select>
+  </section>
+
+  <section id="actions-widgets">
+    <h2>Actions targets</h2>
+    <div id="hover-zone">
+      Hover over me
+      <div id="hover-menu">Now you see the menu</div>
+    </div>
+
+    <button id="dbl-btn">Double-click me</button>
+    <span id="dbl-count">0</span>
+
+    <label for="keys-input">Keyboard target</label>
+    <input id="keys-input" type="text" />
+  </section>
+
+  <section id="alert-widgets">
+    <h2>Alerts</h2>
+    <button id="alert-btn">Plain alert</button>
+    <button id="confirm-btn">Confirm delete</button>
+    <span id="confirm-result">-</span>
+    <button id="prompt-btn">Prompt for a name</button>
+    <span id="prompt-result">-</span>
+  </section>
+
+  <section id="window-widgets">
+    <h2>Windows and state</h2>
+    <a id="open-about" href="http://localhost:5173/about" target="_blank">Open the SPA About page in a new tab</a>
+    <input id="disabled-input" disabled value="you cannot type here" />
+  </section>
+
+  <script>
+    let count = 0;
+    document.getElementById("dbl-btn").addEventListener("dblclick", () => {
+      count++;
+      document.getElementById("dbl-count").textContent = String(count);
+    });
+
+    document.getElementById("alert-btn").addEventListener("click", () => {
+      alert("Book saved.");
+    });
+    document.getElementById("confirm-btn").addEventListener("click", () => {
+      const ok = confirm("Delete this book?");
+      document.getElementById("confirm-result").textContent = ok ? "deleted" : "kept";
+    });
+    document.getElementById("prompt-btn").addEventListener("click", () => {
+      const name = prompt("Reserve under what name?");
+      document.getElementById("prompt-result").textContent = name === null || name === "" ? "-" : name;
+    });
+  </script>
+</body>
+</html>
