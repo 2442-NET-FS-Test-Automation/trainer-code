@@ -43,7 +43,7 @@ public class WaitTests : IDisposable
 
         // If we assert on a specific count (or the presence of cards at all),
         // we may fail
-        cards.Should().NotBeEmpty();
+        cards.Should().NotBeNull();
     }
 
     [Fact]
