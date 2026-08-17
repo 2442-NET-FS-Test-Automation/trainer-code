@@ -8,7 +8,7 @@ import { getToken } from "../auth/storage";
 // Later when we do login and we have to attach that JWT bearer token - 
 // it'll be centralized in one place! No having to chase down every fetch call.
 export const api = axios.create({
-    baseURL: "http://localhost:5137"
+    baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5137"
 })
 
 // Request interceptor - Attack that bearer token (if we have it) to EVERY call
