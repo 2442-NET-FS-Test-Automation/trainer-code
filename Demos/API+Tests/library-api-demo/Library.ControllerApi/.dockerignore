@@ -1,0 +1,12 @@
+# I want to keep my build context small and the image clean. I don't want local dev 
+# build output, logs, git history, etc cluttering my image.
+
+**/bin/
+**/obj/
+**/logs/
+.git 
+.gitignore
+**/*.user
+
+# Finally, we don't want the JWT key making it into the image
+**/appsettings.Development.json
